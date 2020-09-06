@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qrwSlOYJEN7nsODB8w4AO7yCZ/nBeyvhMkFARhbuzRf50PGDej5R+1rozCJXkoydbMalE+EELAS7Dtbt3MoW3A==",
+  "dgSpecHash": "lUK54FtgWSfUk+/v2EjqGHQCAKgAgyw4K8U0falD8+jUF/yMBVf5B/eT6iepq4cwS9qKyuf06NISMt0s3yNYOw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Natalie\\VS Dev\\source\\repos\\Spectrogram Plus\\Spectrogram Plus\\Spectrogram Plus.csproj",
+  "projectFilePath": "C:\\Users\\Natalie\\github.com\\natdorshimer\\Spectrogram-Plus\\Spectrogram Plus.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Natalie\\.nuget\\packages\\extended.wpf.toolkit\\4.0.1\\extended.wpf.toolkit.4.0.1.nupkg.sha512",
     "C:\\Users\\Natalie\\.nuget\\packages\\fftsharp\\1.0.7\\fftsharp.1.0.7.nupkg.sha512",

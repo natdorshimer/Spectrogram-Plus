@@ -36,3 +36,41 @@ C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcore
 C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\ru\Xceed.Wpf.AvalonDock.resources.dll
 C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\sv\Xceed.Wpf.AvalonDock.resources.dll
 C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.exe
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.deps.json
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.runtimeconfig.json
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.runtimeconfig.dev.json
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Spectrogram Plus.pdb
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Xceed.Wpf.AvalonDock.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\Xceed.Wpf.Toolkit.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\FftSharp.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\NAudio.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\cs-CZ\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\de\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\es\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\fr\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\hu\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\it\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\ro\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\ru\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\sv\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\bin\Debug\netcoreapp3.1\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.csprojAssemblyReference.cache
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\SpecPlusWindow.g.cs
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\App.g.cs
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus_MarkupCompile.cache
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus_MarkupCompile.lref
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\SpecPlusWindow.baml
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.g.resources
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.AssemblyInfoInputs.cache
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.AssemblyInfo.cs
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.csproj.CoreCompileInputs.cache
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.csproj.CopyComplete
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.dll
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.pdb
+C:\Users\Natalie\github.com\natdorshimer\Spectrogram-Plus\obj\Debug\netcoreapp3.1\Spectrogram Plus.genruntimeconfig.cache

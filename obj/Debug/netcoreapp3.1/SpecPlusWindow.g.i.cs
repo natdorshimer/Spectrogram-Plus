@@ -141,7 +141,7 @@ namespace SpecPlus {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Spectrogram Plus;V1.0.0.0;component/specpluswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Spectrogram Plus;component/specpluswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\SpecPlusWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

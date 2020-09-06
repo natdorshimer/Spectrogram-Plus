@@ -528,11 +528,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Natalie\\VS Dev\\source\\repos\\Spectrogram Plus\\Spectrogram Plus\\Spectrogram Plus.csproj",
+      "projectUniqueName": "C:\\Users\\Natalie\\github.com\\natdorshimer\\Spectrogram-Plus\\Spectrogram Plus.csproj",
       "projectName": "Spectrogram Plus",
-      "projectPath": "C:\\Users\\Natalie\\VS Dev\\source\\repos\\Spectrogram Plus\\Spectrogram Plus\\Spectrogram Plus.csproj",
+      "projectPath": "C:\\Users\\Natalie\\github.com\\natdorshimer\\Spectrogram-Plus\\Spectrogram Plus.csproj",
       "packagesPath": "C:\\Users\\Natalie\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Natalie\\VS Dev\\source\\repos\\Spectrogram Plus\\Spectrogram Plus\\obj\\",
+      "outputPath": "C:\\Users\\Natalie\\github.com\\natdorshimer\\Spectrogram-Plus\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Natalie\\AppData\\Roaming\\NuGet\\NuGet.Config",
