@@ -1,5 +1,4 @@
 # Spectrogram-Plus
-The Spectrogram Voice Processing Project
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
