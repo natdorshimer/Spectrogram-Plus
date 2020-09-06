@@ -4,7 +4,7 @@ The Spectrogram Voice Processing Project
 <br />
 <p align="center">
   <a href="https://github.com/natdorshimer/Spectrogram-Plus">
-    <img src="https://github.com/natdorshimer/Spectrogram-Plus/icon.PNG" alt="Logo" width="80" height="80">
+    <img src="https://raw.githubusercontent.com/natdorshimer/Spectrogram-Plus/master/icon.PNG" alt="icon" width="80" height="80"/>
   </a>
 
   <h3 align="center">Spectrogram Plus (in development)<br/></h3>
