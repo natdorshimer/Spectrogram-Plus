@@ -1,0 +1,23 @@
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.exe
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.deps.json
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.runtimeconfig.json
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.runtimeconfig.dev.json
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.dll
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\WPF Practice.pdb
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.csprojAssemblyReference.cache
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\MainWindow.g.cs
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\App.g.cs
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice_MarkupCompile.cache
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice_MarkupCompile.lref
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\MainWindow.baml
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.g.resources
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.AssemblyInfoInputs.cache
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.AssemblyInfo.cs
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.csproj.CoreCompileInputs.cache
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.dll
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.pdb
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.genruntimeconfig.cache
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\FftSharp.dll
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\NAudio.dll
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\bin\Debug\netcoreapp3.1\Spectrogram.dll
+C:\Users\Natalie\VS Dev\source\repos\WPF Practice\WPF Practice\obj\Debug\netcoreapp3.1\WPF Practice.csproj.CopyComplete
