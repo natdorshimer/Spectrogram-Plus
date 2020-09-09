@@ -26,8 +26,9 @@ using System.CodeDom;
 using NAudio.Wave.SampleProviders;
 
 /**
- * To Implement
- * See: ProjectMap
+ * Next Tasks:
+ * 1. Implement pause functionality on the spectrogram (button, keybindings)
+ * 2. Implement saving feature to save the select window (or the spectrogram itself)
  */
 namespace SpecPlus
 {
@@ -39,26 +40,32 @@ namespace SpecPlus
     {
         private Spectrogram.Spectrogram spec; //Spectrogram
         private Colormap[] cmaps;             //Colormaps for spectrogram display
-        private DispatcherTimer specTimer;    //Spectrogram clock
+        private DispatcherTimer specTimer;    //Spectrogram/Program clock
         private Listener listener;            //Microphone listener
-
-        private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private string[] sampleRates = { "5500", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
 
 
         //Selected Window Data
         private Point selectedWindowStartPoint;
-        private Point selectedWindowEndPoint;               
+        private Point selectedWindowEndPoint;
         private bool selectedWindowShouldDraw = false; //Determines if the selectedWindowToDraw should continue updating its position 
         private Rectangle selectedWindowToDraw = new Rectangle(); //This is the rectangle that shows the area of the spectrogram selected
+
+
+        //Spectrogram Settings
+        private double whiteNoiseMin = 0;     //Basic filter for White Noise
+        private readonly string[] sampleRates = { "5500", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
+        private bool specPaused = false;
+
 
         private void specTimer_tick(object sender, EventArgs e)
         {
             /**
              * Get new audio from the microphone for the spectrogram to process
              */
+            
             double[] newAudio = listener.GetNewAudio();
-            spec.Add(newAudio, process: false);
+            if(!specPaused)
+                spec.Add(newAudio, process: false);
 
             if (spec.FftsToProcess > 0)
                 ProcessAndDisplaySpectrogram();
@@ -67,19 +74,10 @@ namespace SpecPlus
 
         }
 
-        private void  UpdateSelectedSpecWindow()
+        private void UpdateSelectedSpecWindow()
         {
             Rect rectWindow = new Rect(selectedWindowStartPoint, selectedWindowEndPoint);
-            selectedWindowToDraw.Width = rectWindow.Width;
-            selectedWindowToDraw.Height = rectWindow.Height;
-
-            //TODO: this is basically just because the mousevents won't work if the rectangle is below the mouse. Find a fix
-            const int offset = 5; 
-            rectWindow.Location = new Point(rectWindow.X - offset, rectWindow.Y - offset);
-
             selectedWindowToDraw.Arrange(rectWindow);
-            selectedWindowToDraw.Stroke = Brushes.White;
-            selectedWindowToDraw.StrokeThickness = 1.0;
         }
 
 
@@ -148,31 +146,37 @@ namespace SpecPlus
         }
 
 
-        private void imageSpec_MouseMove(object sender, MouseEventArgs e)
+        private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
         {
             Point p = e.GetPosition(imageSpec);
             selectedWindowEndPoint = p;
             MousePosition.Text = (new Point((int)p.X, (int)p.Y)).ToString();
         }
 
-
-        private void imageSpec_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //Release the window if the user clicks again
-            if (selectedWindowShouldDraw)
-                selectedWindowShouldDraw = false;
-            else
+            //Specify that it should starting drawing the rectangle and initialize a new rectangle onto the painting grid
+            selectedWindowShouldDraw = true;
+            PaintGrid.Children.Remove(selectedWindowToDraw);
+
+            //Selection window settings for spectrogram
+            //Mouse is needed in case mouseleftbutton up happens on the rectangle instead of imagespec
+            selectedWindowToDraw = new Rectangle
             {
-                selectedWindowShouldDraw = true;
-                PaintingGrid.Children.Remove(selectedWindowToDraw);
-                selectedWindowToDraw = new Rectangle();
-                PaintingGrid.Children.Add(selectedWindowToDraw);
-                selectedWindowStartPoint = e.GetPosition(imageSpec);
-            }
+                Stroke = Brushes.White,
+                StrokeThickness = 1.0
+            };
+
+            
+            PaintGrid.Children.Add(selectedWindowToDraw);
+            selectedWindowStartPoint = e.GetPosition(imageSpec);
+            selectedWindowEndPoint = e.GetPosition(imageSpec);
         }
 
-        private void imageSpec_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void PaintGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            selectedWindowShouldDraw = false;
+
             /**
              * TODO: Implement the features upon selecting the window
              * 
@@ -184,9 +188,9 @@ namespace SpecPlus
         }
 
         //TODO: Modify behavior for filters once implemented
-        private void imageSpec_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            PaintingGrid.Children.Remove(selectedWindowToDraw);
+            PaintGrid.Children.Remove(selectedWindowToDraw);
             selectedWindowToDraw = new Rectangle();
             selectedWindowShouldDraw = false;
         }
@@ -231,6 +235,26 @@ namespace SpecPlus
             specTimer.Interval = TimeSpan.FromMilliseconds(15);
             specTimer.Tick += new EventHandler(specTimer_tick);
             specTimer.Start();
+
         }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
+        
+
+        /**
+         * General Purpose Keyboard event handler for the window
+         */
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Space:
+                    TogglePause();
+                    break;
+            }
+        }
+
+        private void TogglePause() => specPaused = !specPaused;
     }
+
 }

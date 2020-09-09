@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpecPlus"
         mc:Ignorable="d"
-        Title="Spectrogram Plus" Height="700" Width="800" FontSize="16" FontFamily="Segoe UI Light" Icon="/icon.PNG">
+        Title="Spectrogram Plus" Height="700" Width="800" FontSize="16" FontFamily="Segoe UI Light" Icon="/icon.PNG"
+        KeyDown="Window_KeyDown"
+        >
     <Grid x:Name="SpecPlusGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -64,6 +66,7 @@
             <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="0,0,0,10"
                     Maximum="15" Value="7.5"/>
             <TextBox x:Name="TextBoxWhiteNoise" Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="7" KeyDown="TextBoxWhiteNoise_KeyDown" />
+            <Button x:Name="PauseButton" Grid.Row="7" Grid.Column="2" Click="PauseButton_Click">Pause</Button>
         </Grid>
         <Grid x:Name="SpecGrid"  Grid.Row="0" Grid.Column="1">
             <Grid.ColumnDefinitions>
@@ -74,15 +77,17 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer x:Name ="scrollViewerSpec" VerticalScrollBarVisibility="Visible"  HorizontalScrollBarVisibility="Visible" Grid.Row ="1" Grid.Column="1"  Margin="20,0,0,20" ScrollChanged="scrollViewerSpec_ScrollChanged">
-                <Grid x:Name="PaintingGrid">
-                    <Image x:Name="imageSpec" MouseMove="imageSpec_MouseMove" MouseLeftButtonDown="imageSpec_MouseLeftButtonDown" MouseLeftButtonUp="imageSpec_MouseLeftButtonUp" MouseRightButtonDown="imageSpec_MouseRightButtonDown" />
+                <Grid x:Name="PaintGrid" MouseLeftButtonDown="PaintGrid_MouseLeftButtonDown" MouseLeftButtonUp="PaintGrid_MouseLeftButtonUp" MouseRightButtonDown="PaintGrid_MouseRightButtonDown">
+                    <Image x:Name="imageSpec" MouseMove="PaintGrid_MouseMove"  />
                 </Grid>
             </ScrollViewer>
-            <TextBlock x:Name="MousePosition" Grid.Row="2" Grid.Column="1">
+            <TextBlock x:Name="MousePosition" Grid.Row="3" Grid.Column="1">
                 "0,0"
             </TextBlock>
+            
         </Grid>
     </Grid>
 </Window>
