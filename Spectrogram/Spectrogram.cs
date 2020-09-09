@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -13,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Spectrogram_Structures;
+using System.Drawing;
 
 namespace Spectrogram
 {
@@ -147,21 +146,29 @@ namespace Spectrogram
             return fftsMel;
         }
 
+        
+        /* Currently deprecated in WPF projects
         public Bitmap GetBitmap(double intensity = 1, bool dB = false, bool roll = false)
         {
             return Image.GetBitmap(ffts, cmap, intensity, dB, roll, NextColumnIndex);
-        }
+        }*/
 
         public BitmapSource GetBitmapSource(double intensity = 1, bool dB = false, bool roll = false, double whiteNoiseMin=0) =>
             Image.GetBitmapSource(ffts, cmap, intensity, dB, roll, NextColumnIndex, whiteNoiseMin);
 
+
+        /* Currently deprecated in WPF projects
         public Bitmap GetBitmapMel(int melBinCount = 25, double intensity = 1, bool dB = false, bool roll = false) =>
             Image.GetBitmap(GetMelFFTs(melBinCount), cmap, intensity, dB, roll, NextColumnIndex);
+        */
 
         public BitmapSource GetBitmapSourceMel(int melBinCount = 25, double intensity = 1, bool dB = false, bool roll = false) =>
             Image.GetBitmapSource(GetMelFFTs(melBinCount), cmap, intensity, dB, roll, NextColumnIndex);
 
 
+        /**
+         * TODO: Requires testing
+         */
         public void SaveImage(string fileName, double intensity = 1, bool dB = false, bool roll = false)
         {
             if (ffts.Count == 0)
@@ -169,22 +176,31 @@ namespace Spectrogram
 
             string extension = Path.GetExtension(fileName).ToLower();
 
-            ImageFormat fmt;
+            BitmapEncoder encoder;
             if (extension == ".bmp")
-                fmt = ImageFormat.Bmp;
+                encoder = new BmpBitmapEncoder();
             else if (extension == ".png")
-                fmt = ImageFormat.Png;
+                encoder = new PngBitmapEncoder();
             else if (extension == ".jpg" || extension == ".jpeg")
-                fmt = ImageFormat.Jpeg;
+                encoder = new JpegBitmapEncoder();
             else if (extension == ".gif")
-                fmt = ImageFormat.Gif;
+                encoder = new GifBitmapEncoder();
             else
                 throw new ArgumentException("unknown file extension");
 
-            Image.GetBitmap(ffts, cmap, intensity, dB, roll, NextColumnIndex).Save(fileName, fmt);
+
+            BitmapSource image = Image.GetBitmapSource(ffts, cmap, intensity, dB, roll, NextColumnIndex);
+            encoder.Frames.Add(BitmapFrame.Create(image));
+
+            using (var fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create))
+            {
+                encoder.Save(fileStream);
+            }
+
+
         }
 
-        public Bitmap GetBitmapMax(double intensity = 1, bool dB = false, bool roll = false, int reduction = 4)
+        public BitmapSource GetBitmapMax(double intensity = 1, bool dB = false, bool roll = false, int reduction = 4)
         {
             List<double[]> ffts2 = new List<double[]>();
             for (int i = 0; i < ffts.Count; i++)
@@ -196,7 +212,7 @@ namespace Spectrogram
                         d2[j] = Math.Max(d2[j], d1[j * reduction + k]);
                 ffts2.Add(d2);
             }
-            return Image.GetBitmap(ffts2, cmap, intensity, dB, roll, NextColumnIndex);
+            return Image.GetBitmapSource(ffts2, cmap, intensity, dB, roll, NextColumnIndex);
         }
 
         public void SaveData(string filePath, int melBinCount = 0)
@@ -227,6 +243,9 @@ namespace Spectrogram
             }
         }
 
+        /**
+         * TODO: This still needs to be converted to WPF
+         */
         public Bitmap GetVerticalScale(int width, int offsetHz = 0, int tickSize = 3, int reduction = 1)
         {
             return Scale.Vertical(width, settings, offsetHz, tickSize, reduction);

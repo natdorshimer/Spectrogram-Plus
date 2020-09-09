@@ -23,15 +23,11 @@ using System.IO;
 using System.Globalization;
 using Spectrogram_Structures;
 using System.CodeDom;
+using NAudio.Wave.SampleProviders;
 
 /**
- * To Implement:
- * GUI display for displaying Hz when your mouse is on the spectrogram 
- * Method for pausing and selecting a part of the spectrogram 
- * 
- * Features to reserach and implement :
- * Audio filtering / Transformation on the selected part of the spectrogram
- * GUI interface popup that opens when you want to modify that data
+ * To Implement
+ * See: ProjectMap
  */
 namespace SpecPlus
 {
@@ -45,7 +41,17 @@ namespace SpecPlus
         private Colormap[] cmaps;             //Colormaps for spectrogram display
         private DispatcherTimer specTimer;    //Spectrogram clock
         private Listener listener;            //Microphone listener
-        private double whiteNoiseMin = 0;
+
+        private double whiteNoiseMin = 0;     //Basic filter for White Noise
+        private string[] sampleRates = { "5500", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
+
+
+        //Selected Window Data
+        private Point selectedWindowStartPoint;
+        private Point selectedWindowEndPoint;               
+        private bool selectedWindowShouldDraw = false; //Determines if the selectedWindowToDraw should continue updating its position 
+        private Rectangle selectedWindowToDraw = new Rectangle(); //This is the rectangle that shows the area of the spectrogram selected
+
         private void specTimer_tick(object sender, EventArgs e)
         {
             /**
@@ -53,20 +59,43 @@ namespace SpecPlus
              */
             double[] newAudio = listener.GetNewAudio();
             spec.Add(newAudio, process: false);
+
+            if (spec.FftsToProcess > 0)
+                ProcessAndDisplaySpectrogram();
+            if(selectedWindowShouldDraw)
+                UpdateSelectedSpecWindow();
+
+        }
+
+        private void  UpdateSelectedSpecWindow()
+        {
+            Rect rectWindow = new Rect(selectedWindowStartPoint, selectedWindowEndPoint);
+            selectedWindowToDraw.Width = rectWindow.Width;
+            selectedWindowToDraw.Height = rectWindow.Height;
+
+            //TODO: this is basically just because the mousevents won't work if the rectangle is below the mouse. Find a fix
+            const int offset = 5; 
+            rectWindow.Location = new Point(rectWindow.X - offset, rectWindow.Y - offset);
+
+            selectedWindowToDraw.Arrange(rectWindow);
+            selectedWindowToDraw.Stroke = Brushes.White;
+            selectedWindowToDraw.StrokeThickness = 1.0;
+        }
+
+
+        private void ProcessAndDisplaySpectrogram()
+        {
+            //Display Settings
+            const int rightMargin = 20;
             int size = spec.GetFFTs().Count;
             double brightness = sliderBrightness.Value;
-
-            
-            const int rightMargin = 20;
             SpecGrid.MaxWidth = this.ActualWidth - ControlsGrid.ActualWidth - rightMargin;
             SpecGrid.MaxHeight = this.ActualHeight;
-            scrollViewerSpec.MaxHeight = this.ActualHeight-60;
-            spec.SetFixedWidth((int)SpecGrid.MaxWidth-55);
-            if (spec.FftsToProcess > 0)
-            {
-                spec.Process();
-                imageSpec.Source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
-            }
+            scrollViewerSpec.MaxHeight = this.ActualHeight - 60;
+            spec.SetFixedWidth((int)SpecGrid.MaxWidth - 55);
+
+            spec.Process();
+            imageSpec.Source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
         }
 
         /**
@@ -74,7 +103,7 @@ namespace SpecPlus
          */
         public void StartListening()
         {
-            int sampleRate = Int32.Parse(SampleRates[cbSampleRate.SelectedIndex]);
+            int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
             int stepSize = fftSize / 20;
 
@@ -83,14 +112,89 @@ namespace SpecPlus
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
         }
 
+ 
 
+        public SpecPlusWindow()
+        {
+            InitializeComponent();
+            SpecInit();
+        }
+
+
+        /**
+         * Event Handlers
+         */
+
+        private void cbMicInput_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbFFTsize_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
+
+        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            scrollViewerSpec.ScrollToRightEnd();
+        }
+
+        private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                Double.TryParse(TextBoxWhiteNoise.Text, out whiteNoiseMin);
+        }
+
+        private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            StartListening();
+        }
+
+
+        private void imageSpec_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point p = e.GetPosition(imageSpec);
+            selectedWindowEndPoint = p;
+            MousePosition.Text = (new Point((int)p.X, (int)p.Y)).ToString();
+        }
+
+
+        private void imageSpec_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //Release the window if the user clicks again
+            if (selectedWindowShouldDraw)
+                selectedWindowShouldDraw = false;
+            else
+            {
+                selectedWindowShouldDraw = true;
+                PaintingGrid.Children.Remove(selectedWindowToDraw);
+                selectedWindowToDraw = new Rectangle();
+                PaintingGrid.Children.Add(selectedWindowToDraw);
+                selectedWindowStartPoint = e.GetPosition(imageSpec);
+            }
+        }
+
+        private void imageSpec_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            /**
+             * TODO: Implement the features upon selecting the window
+             * 
+             * 1. Implement pause functionality on the spectrogram
+             * 2. Implement saving feature to save the window
+             * 3. Implement basic filters to apply to the spectrogram / save the spectrogram
+             * 4. Make a gui for filters
+             */
+        }
+
+        //TODO: Modify behavior for filters once implemented
+        private void imageSpec_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            PaintingGrid.Children.Remove(selectedWindowToDraw);
+            selectedWindowToDraw = new Rectangle();
+            selectedWindowShouldDraw = false;
+        }
+
+        
         private void SpecInit()
         {
-
-            SampleRates.Add("6000");
-            SampleRates.Add("12000");
-            SampleRates.Add("24000");
-            foreach (string sr in SampleRates)
+            foreach (string sr in sampleRates)
                 cbSampleRate.Items.Add(sr);
             cbSampleRate.SelectedIndex = 1;
 
@@ -128,38 +232,5 @@ namespace SpecPlus
             specTimer.Tick += new EventHandler(specTimer_tick);
             specTimer.Start();
         }
-
-        private List<string> SampleRates = new List<string>();
-
-        public SpecPlusWindow()
-        {
-            InitializeComponent();
-            SpecInit();
-        }
-
-        private void cbMicInput_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
-
-        private void cbFFTsize_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
-
-        private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
-
-        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            scrollViewerSpec.ScrollToRightEnd();
-        }
-
-        private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                Double.TryParse(TextBoxWhiteNoise.Text, out whiteNoiseMin);
-            }
-        }
-
-        private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            StartListening();
-        }
     }
-
 }
