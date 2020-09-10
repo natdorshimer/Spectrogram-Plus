@@ -33,7 +33,9 @@ namespace Spectrogram
         public double FreqMin { get { return settings.FreqMin; } }
 
         private readonly Settings settings;
-        private IList<double[]> ffts;
+        private List<double[]> ffts;
+
+        private List<FftSharp.Complex[]> ffts_complex;
         private readonly List<double> newAudio = new List<double>();
         private Colormap cmap = Colormap.Viridis;
 
@@ -43,6 +45,7 @@ namespace Spectrogram
             int? fixedWidth = null, int offsetHz = 0)
         {
             ffts = new List<double[]>();
+            ffts_complex = new List<FftSharp.Complex[]>();
             this.SetColormap(Colormap.Viridis);
             settings = new Settings(sampleRate, fftSize, stepSize, minFreq, maxFreq, offsetHz);
             
@@ -50,6 +53,7 @@ namespace Spectrogram
                 SetFixedWidth(fixedWidth.Value);
 
         }
+
 
         public override string ToString()
         {
@@ -75,6 +79,10 @@ namespace Spectrogram
         {
             this.cmap = cmap ?? this.cmap;
         }
+
+        public int GetFftIndex1 () { return settings.FftIndex1; }
+
+        public double[] GetWindow(){ return settings.Window; }
 
         public void SetWindow(double[] newWindow)
         {
@@ -102,6 +110,7 @@ namespace Spectrogram
             rollOffset = -FftsProcessed + offset;
         }
 
+
         public double[][] Process()
         {
             if (FftsToProcess < 1)
@@ -119,17 +128,25 @@ namespace Spectrogram
 
                 FftSharp.Transform.FFT(buffer);
 
+                //Deep copy the buffer for later use in inverse fourier transforming
+                FftSharp.Complex[] buffer_copy = new FftSharp.Complex[buffer.Length];
+                for (int i = 0; i < buffer.Length; i++)
+                    buffer_copy[i] = new FftSharp.Complex(buffer[i].Real/1, buffer[i].Imaginary /1);
+                ffts_complex.Add(buffer_copy);
+
                 newFfts[newFftIndex] = new double[settings.Height];
-                for (int i = 0; i < settings.Height; i++)
-                    newFfts[newFftIndex][i] = buffer[settings.FftIndex1 + i].Magnitude / settings.FftSize;
+                for (int i = 0; i < settings.Height; i++) {
+                    newFfts[newFftIndex][i] = buffer[settings.FftIndex1 + i].Magnitude/settings.FftSize;
+                }
             });
 
-            foreach (var newFft in newFfts)
+            foreach (var newFft in newFfts) 
                 ffts.Add(newFft);
+            
             FftsProcessed += newFfts.Length;
-
             newAudio.RemoveRange(0, newFftCount * settings.StepSize);
             PadOrTrimForFixedWidth();
+
             return newFfts;
         }
 
@@ -196,8 +213,6 @@ namespace Spectrogram
             {
                 encoder.Save(fileStream);
             }
-
-
         }
 
         public BitmapSource GetBitmapMax(double intensity = 1, bool dB = false, bool roll = false, int reduction = 4)
@@ -229,17 +244,21 @@ namespace Spectrogram
             PadOrTrimForFixedWidth();
         }
 
+        //TODO: REQUIRES TESTING FOR COMPLEX BUFFER
         private void PadOrTrimForFixedWidth()
         {
             if (fixedWidth > 0)
             {
                 int overhang = Width - fixedWidth;
                 if (overhang > 0) {
-                    (ffts as List<double[]>).RemoveRange(0, overhang);
+                    ffts.RemoveRange(0, overhang);
+                    ffts_complex.RemoveRange(0, overhang);
                 }
 
-                while (ffts.Count < fixedWidth)
+                while (ffts.Count < fixedWidth) {
                     ffts.Insert(0, new double[Height]);
+                    ffts_complex.Insert(0, new FftSharp.Complex[Height]);
+                }
             }
         }
 
@@ -259,9 +278,14 @@ namespace Spectrogram
             return pixelRow - 1;
         }
 
-        public IList<double[]> GetFFTs()
+        public List<double[]> GetFFTs()
         {
             return ffts;
+        }
+
+        public List<FftSharp.Complex[]> GetComplexFFTS()
+        {
+            return ffts_complex;
         }
 
         public (double freqHz, double magRms) GetPeak(bool latestFft = true)

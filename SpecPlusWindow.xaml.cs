@@ -24,11 +24,13 @@ using System.Globalization;
 using Spectrogram_Structures;
 using System.CodeDom;
 using NAudio.Wave.SampleProviders;
+using SpectrogramAnalysisTools;
+using Microsoft.Win32;
 
 /**
  * Next Tasks:
- * 1. Implement pause functionality on the spectrogram (button, keybindings)
- * 2. Implement saving feature to save the select window (or the spectrogram itself)
+ * 1. Implement saving feature to save the select window (or the spectrogram itself)
+ * 2. Implement some basic audio filters
  */
 namespace SpecPlus
 {
@@ -103,7 +105,7 @@ namespace SpecPlus
         {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / 20;
+            int stepSize = fftSize / 10; //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -179,23 +181,24 @@ namespace SpecPlus
 
             /**
              * TODO: Implement the features upon selecting the window
-             * 
-             * 1. Implement pause functionality on the spectrogram
-             * 2. Implement saving feature to save the window
-             * 3. Implement basic filters to apply to the spectrogram / save the spectrogram
-             * 4. Make a gui for filters
+             *   * Implement basic filters to apply to the spectrogram / save the spectrogram
              */
         }
 
-        //TODO: Modify behavior for filters once implemented
         private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TogglePause();
+
+            //TODO: Modify behavior for filters once implemented, open a dialog box with filtering options
+        }
+
+        private void RemoveSelectedWindow()
         {
             PaintGrid.Children.Remove(selectedWindowToDraw);
             selectedWindowToDraw = new Rectangle();
             selectedWindowShouldDraw = false;
         }
 
-        
         private void SpecInit()
         {
             foreach (string sr in sampleRates)
@@ -251,9 +254,30 @@ namespace SpecPlus
                 case Key.Space:
                     TogglePause();
                     break;
+                case Key.Delete:
+                    RemoveSelectedWindow();
+                    break;
+                case (Key.S):
+                    if((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
+                    {
+                        SaveSpectrogram();
+                    }
+                    break;
             }
         }
 
+        private void SaveSpectrogram()
+        {
+            TogglePause();
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.Filter = "wav files(*.wav)| *.wav| All files(*.*) | *.* ";
+            saveFile.FilterIndex = 1;
+            if ((bool)saveFile.ShowDialog())
+            {
+                string filename = saveFile.FileName;
+                SpecAnalysis.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.FftSize, spec.StepSize, spec.SampleRate, spec.GetWindow());
+            }
+        }
         private void TogglePause() => specPaused = !specPaused;
     }
 
