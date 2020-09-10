@@ -37,7 +37,10 @@ namespace SpectrogramAnalysisTools
             writer.WriteSamples(audio, 0, audio.Length);
         }
 
-        
+
+        /// <param name="ffts">List of ffts with a window block separation of stepSize</param>
+        /// <param name="stepSize">The step size the window took when constructing the ffts</param>
+        /// <param name="window">Window used to create the ffts originally. Need to ISTFT them back.</param>
         public static double[] ISTFT(List<Complex[]> ffts, int stepSize, double[] window)
         {
             /**

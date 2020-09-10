@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Spectrogram_Structures;
 using System.Drawing;
+using FftSharp;
+using SpectrogramAnalysisTools;
 
 namespace Spectrogram
 {
@@ -34,7 +36,6 @@ namespace Spectrogram
 
         private readonly Settings settings;
         private List<double[]> ffts;
-
         private List<FftSharp.Complex[]> ffts_complex;
         private readonly List<double> newAudio = new List<double>();
         private Colormap cmap = Colormap.Viridis;
@@ -127,12 +128,7 @@ namespace Spectrogram
                     buffer[i].Real = newAudio[sourceIndex + i] * settings.Window[i];
 
                 FftSharp.Transform.FFT(buffer);
-
-                //Deep copy the buffer for later use in inverse fourier transforming
-                FftSharp.Complex[] buffer_copy = new FftSharp.Complex[buffer.Length];
-                for (int i = 0; i < buffer.Length; i++)
-                    buffer_copy[i] = new FftSharp.Complex(buffer[i].Real/1, buffer[i].Imaginary /1);
-                ffts_complex.Add(buffer_copy);
+                ffts_complex.Add(buffer);
 
                 newFfts[newFftIndex] = new double[settings.Height];
                 for (int i = 0; i < settings.Height; i++) {
@@ -145,8 +141,8 @@ namespace Spectrogram
             
             FftsProcessed += newFfts.Length;
             newAudio.RemoveRange(0, newFftCount * settings.StepSize);
-            PadOrTrimForFixedWidth();
 
+            PadOrTrimForFixedWidth();
             return newFfts;
         }
 
@@ -287,6 +283,7 @@ namespace Spectrogram
             return ffts_complex;
         }
 
+
         public (double freqHz, double magRms) GetPeak(bool latestFft = true)
         {
             if (ffts.Count == 0)
@@ -313,6 +310,44 @@ namespace Spectrogram
             double peakFreqHz = maxFreq * peakFreqFrac;
 
             return (peakFreqHz, peakMagnitude);
+        }
+    }
+
+    /**
+     * Kind of like a mini-spectrogram class that I'll be using for audio analysis
+     */
+    public class FFTs
+    {
+        private List<Complex[]> ffts;
+        public double[] window { get; private set; }
+        public int sampleRate { get; private set; }
+        public int stepSize { get; private set; }
+
+        public FFTs(List<Complex[]> fft_list, double[] window, int sampleRate, int stepSize)
+        {
+            ffts = fft_list;
+            this.window = window;
+            this.sampleRate = sampleRate;
+            this.stepSize = stepSize;
+        }
+
+        public double[] GetAudio()
+        {
+            return SpecAnalysis.ISTFT(ffts, stepSize, window);
+        }
+
+        public List<Complex[]> GetFFTs => ffts;
+
+        //Produces a deep copy of the FFTs
+        public List<Complex[]> DeepCopyFFTs() {
+            List<Complex[]> newList = new List<Complex[]>();
+            foreach (Complex[] fft in ffts)
+            {
+                Complex[] copy = new Complex[fft.Length];
+                for (int i = 0; i < fft.Length; i++)
+                    copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+            }
+            return newList;
         }
     }
 }
