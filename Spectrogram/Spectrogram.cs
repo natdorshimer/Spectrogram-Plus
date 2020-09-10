@@ -244,7 +244,6 @@ namespace Spectrogram
             PadOrTrimForFixedWidth();
         }
 
-        //TODO: REQUIRES TESTING FOR COMPLEX BUFFER
         private void PadOrTrimForFixedWidth()
         {
             if (fixedWidth > 0)

@@ -18,7 +18,7 @@ namespace SpectrogramAnalysisTools
     public class SpecAnalysis
     {
 
-        public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int FftSize, int stepSize, int sampleRate, double[] window)
+        public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)
         {
             //Deep copy the complex ffts into a new buffer to safely transform
             List<Complex[]> buffers = new List<Complex[]>();
@@ -29,7 +29,7 @@ namespace SpectrogramAnalysisTools
                 buffers.Add(arr_copy);
             }
 
-            double[] audioD = ISTFT(ffts, FftSize, stepSize, window);
+            double[] audioD = ISTFT(ffts, stepSize, window);
             float[] audio = new float[audioD.Length];
             for (int i = 0; i < audio.Length; i++) audio[i] = (float) audioD[i];
 
@@ -38,13 +38,13 @@ namespace SpectrogramAnalysisTools
         }
 
         
-        public static double[] ISTFT(List<Complex[]> ffts, int FftSize, int stepSize, double[] window)
+        public static double[] ISTFT(List<Complex[]> ffts, int stepSize, double[] window)
         {
             /**
              * Inverse Short Term Fourier Transform
              * See: http://eeweb.poly.edu/iselesni/EL713/STFT/stft_inverse.pdf
              * 
-             * In our case, the window length N = Fftsize which is the size of each ffts array.
+             * In our case, the window length N is also the size of each ffts array.
              * The step size is also not N/2, the step size is whatever the user sets it to be. 
              * 
              * Below is an example where the step size is 3 with a window size (FftSize) of FftSize
@@ -65,7 +65,7 @@ namespace SpectrogramAnalysisTools
              * TODO: Implement testing to assert that the deviated quality is within standards
              */
 
-            double[] data = new double[FftSize + ffts.Count * stepSize];
+            double[] data = new double[window.Length + ffts.Count * stepSize];
             for(int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
             {
                 Complex[] buffer = ffts[windowed_block];
@@ -77,7 +77,6 @@ namespace SpectrogramAnalysisTools
             
             return data;
         }
-
 
     }
 

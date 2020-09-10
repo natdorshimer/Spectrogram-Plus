@@ -259,12 +259,11 @@ namespace SpecPlus
                     break;
                 case (Key.S):
                     if((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
-                    {
                         SaveSpectrogram();
-                    }
                     break;
             }
         }
+
 
         private void SaveSpectrogram()
         {
@@ -275,10 +274,18 @@ namespace SpecPlus
             if ((bool)saveFile.ShowDialog())
             {
                 string filename = saveFile.FileName;
-                SpecAnalysis.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.FftSize, spec.StepSize, spec.SampleRate, spec.GetWindow());
+                SpecAnalysis.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
             }
         }
-        private void TogglePause() => specPaused = !specPaused;
+
+        private void TogglePause()
+        {
+            specPaused = !specPaused;
+            if (specPaused)
+                PauseButtonText.Text = "Run";
+            else
+                PauseButtonText.Text = "Pause";
+        }
     }
 
 }
