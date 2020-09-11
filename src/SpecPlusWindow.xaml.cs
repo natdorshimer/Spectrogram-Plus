@@ -54,44 +54,41 @@ namespace SpecPlus
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private readonly string[] sampleRates = { "5500", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
+        private readonly string[] sampleRates = { "6144", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
 
 
-        private void specTimer_tick(object sender, EventArgs e)
+        public SpecPlusWindow()
         {
-            /**
-             * Get new audio from the microphone for the spectrogram to process
-             */
-            
+            InitializeComponent();
+            SpecInit();
+        }
+
+        private void SpecTimer_tick(object sender, EventArgs e)
+        {
+
+            //Get new audio from the microphone for the spectrogram to process
             double[] newAudio = listener.GetNewAudio();
-            if(!specPaused)
+            if (!specPaused)
                 spec.Add(newAudio, process: false);
 
+            //Update window components
             if (spec.FftsToProcess > 0)
                 ProcessAndDisplaySpectrogram();
-            if(selectedWindowShouldDraw)
+            if (selectedWindowShouldDraw)
                 UpdateSelectedSpecWindow();
-
         }
-
-        private void UpdateSelectedSpecWindow()
-        {
-            Rect rectWindow = new Rect(selectedWindowStartPoint, selectedWindowEndPoint);
-            selectedWindowToDraw.Arrange(rectWindow);
-        }
-
 
         private void ProcessAndDisplaySpectrogram()
         {
             //Display Settings
+            //TODO: Clean up GUI code
             const int rightMargin = 20;
-            int size = spec.GetFFTs().Count;
             double brightness = sliderBrightness.Value;
             SpecGrid.MaxWidth = this.ActualWidth - ControlsGrid.ActualWidth - rightMargin;
             SpecGrid.MaxHeight = this.ActualHeight;
             scrollViewerSpec.MaxHeight = this.ActualHeight - 60;
-           
+
             spec.SetFixedWidth((int)SpecGrid.MaxWidth - 55);
 
             spec.Process();
@@ -112,91 +109,14 @@ namespace SpecPlus
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
         }
 
- 
 
-        public SpecPlusWindow()
+        private void TogglePause()
         {
-            InitializeComponent();
-            SpecInit();
-        }
-
-
-        /**
-         * Event Handlers
-         */
-
-        private void cbMicInput_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
-
-        private void cbFFTsize_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
-
-        private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
-
-        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            scrollViewerSpec.ScrollToRightEnd();
-        }
-
-        private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-                Double.TryParse(TextBoxWhiteNoise.Text, out whiteNoiseMin);
-        }
-
-        private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            StartListening();
-        }
-
-
-        private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
-        {
-            Point p = e.GetPosition(imageSpec);
-            selectedWindowEndPoint = p;
-            MousePosition.Text = (new Point((int)p.X, (int)p.Y)).ToString();
-        }
-
-        private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //Specify that it should starting drawing the rectangle and initialize a new rectangle onto the painting grid
-            selectedWindowShouldDraw = true;
-            PaintGrid.Children.Remove(selectedWindowToDraw);
-
-            //Selection window settings for spectrogram
-            //Mouse is needed in case mouseleftbutton up happens on the rectangle instead of imagespec
-            selectedWindowToDraw = new Rectangle
-            {
-                Stroke = Brushes.White,
-                StrokeThickness = 1.0
-            };
-
-            
-            PaintGrid.Children.Add(selectedWindowToDraw);
-            selectedWindowStartPoint = e.GetPosition(imageSpec);
-            selectedWindowEndPoint = e.GetPosition(imageSpec);
-        }
-
-        private void PaintGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            selectedWindowShouldDraw = false;
-
-            /**
-             * TODO: Implement the features upon selecting the window
-             *   * Implement basic filters to apply to the spectrogram / save the spectrogram
-             */
-        }
-
-        private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            TogglePause();
-
-            //TODO: Modify behavior for filters once implemented, open a dialog box with filtering options
-        }
-
-        private void RemoveSelectedWindow()
-        {
-            PaintGrid.Children.Remove(selectedWindowToDraw);
-            selectedWindowToDraw = new Rectangle();
-            selectedWindowShouldDraw = false;
+            specPaused = !specPaused;
+            if (specPaused)
+                PauseButtonText.Text = "Run";
+            else
+                PauseButtonText.Text = "Pause";
         }
 
         private void SpecInit()
@@ -236,40 +156,13 @@ namespace SpecPlus
             //Timer used to continously update the spectrogram with new data
             specTimer = new DispatcherTimer();
             specTimer.Interval = TimeSpan.FromMilliseconds(15);
-            specTimer.Tick += new EventHandler(specTimer_tick);
+            specTimer.Tick += new EventHandler(SpecTimer_tick);
             specTimer.Start();
-
-            
-
         }
-
-        private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
-        
-
-        /**
-         * General Purpose Keyboard event handler for the window
-         */
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Space:
-                    TogglePause();
-                    break;
-                case Key.Delete:
-                    RemoveSelectedWindow();
-                    break;
-                case (Key.S):
-                    if((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
-                        SaveSpectrogram();
-                    break;
-            }
-        }
-
 
         private void SaveSpectrogram()
         {
-            if(!specPaused) 
+            if (!specPaused)
                 TogglePause();
 
             SaveFileDialog saveFile = new SaveFileDialog();
@@ -281,18 +174,111 @@ namespace SpecPlus
                 FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
                 Filter.ApplyFilter(stft, AudioFilters.NoFilter);
                 Fourier.SaveFFTsToWav(filename, stft);
-               // Fourier.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
             }
         }
 
-        private void TogglePause()
+        private void InitSelectedSpecWindow(Point startPoint)
         {
-            specPaused = !specPaused;
-            if (specPaused)
-                PauseButtonText.Text = "Run";
-            else
-                PauseButtonText.Text = "Pause";
-        }
-    }
+            //Specify that it should starting drawing the rectangle and initialize a new rectangle onto the painting grid
+            selectedWindowShouldDraw = true;
+            PaintGrid.Children.Remove(selectedWindowToDraw);
 
+            //Selection window settings for spectrogram
+            //Mouse is needed in case mouseleftbutton up happens on the rectangle instead of imagespec
+            selectedWindowToDraw = new Rectangle
+            {
+                Stroke = Brushes.White,
+                StrokeThickness = 1.0
+            };
+
+            PaintGrid.Children.Add(selectedWindowToDraw);
+
+            UpdateSelectedSpecWindow();
+            selectedWindowStartPoint = startPoint;
+            selectedWindowEndPoint = startPoint;
+        }
+
+        private void UpdateSelectedSpecWindow()
+        {
+            Rect rectWindow = new Rect(selectedWindowStartPoint, selectedWindowEndPoint);
+            selectedWindowToDraw.Arrange(rectWindow);
+        }
+
+        private void RemoveSelectedWindow()
+        {
+            PaintGrid.Children.Remove(selectedWindowToDraw);
+            selectedWindowToDraw = new Rectangle();
+            selectedWindowShouldDraw = false;
+        }
+
+        /**
+         * Event Handlers
+         */
+
+        private void cbMicInput_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbFFTsize_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
+
+        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e) => scrollViewerSpec.ScrollToRightEnd();
+
+        private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                Double.TryParse(TextBoxWhiteNoise.Text, out whiteNoiseMin);
+        }
+
+        private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point p = e.GetPosition(imageSpec);
+            selectedWindowEndPoint = p;
+
+            MousePosition.Text = (new Point((int)p.X, (int)p.Y)).ToString();
+            
+        }
+
+        private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) 
+            => InitSelectedSpecWindow(e.GetPosition(imageSpec));
+        
+        private void PaintGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            selectedWindowShouldDraw = false;
+
+            /**
+             * TODO: Implement the features upon selecting the window
+             *   * Implement basic filters to apply to the spectrogram / save the spectrogram
+             */
+        }
+
+        private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TogglePause();
+
+            //TODO: Modify behavior for filters once implemented, open a dialog box with filtering options
+        }
+
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Space:
+                    TogglePause();
+                    break;
+                case Key.Delete:
+                    RemoveSelectedWindow();
+                    break;
+                case (Key.S):
+                    if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
+                        SaveSpectrogram();
+                    break;
+            }
+        }
+
+    }
 }

@@ -14,7 +14,7 @@ namespace AudioAnalysis
          * 
          * This allows us to obtain a fourier transform as a function of frequency AND time, S(w, t) instead of being solely dependent on frequency. 
          *      This representation of audio is most akin to how our ears actually interperet audio. They work by sampling the FFT of the sound it hears, which is a function of time
-         *      This also allows us to perform signal processing on small windows of time.
+         *      This also allows us to easily perform signal processing on small windows of time.
 
          * TODO: Consider making a save function in this class instead of it being external.
          */
@@ -87,5 +87,6 @@ namespace AudioAnalysis
             this.stepSize = stepSize;
             this.window = window;
         }
+
     }
 }
