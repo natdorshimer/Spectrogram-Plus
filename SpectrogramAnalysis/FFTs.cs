@@ -16,6 +16,7 @@ namespace SpectrogramAnalysis
          *      This representation of audio is most akin to how our ears actually interperet audio. They work by sampling the FFT of the sound it hears, which is a function of time
          *      This also allows us to perform signal processing on small windows of time.
          */
+
         private List<Complex[]> ffts;
         public double[] window { get; private set; }
         public int sampleRate { get; private set; }
