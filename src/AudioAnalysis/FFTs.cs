@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FftSharp;
-
+using NAudio.Wave;
 namespace AudioAnalysis
 {
     public class FFTs
@@ -16,7 +16,7 @@ namespace AudioAnalysis
          *      This representation of audio is most akin to how our ears actually interperet audio. They work by sampling the FFT of the sound it hears, which is a function of time
          *      This also allows us to easily perform signal processing on small windows of time.
 
-         * TODO: Consider making a save function in this class instead of it being external.
+         * TODO: Consider making a save method in this class instead of it being external.
          */
 
         private List<Complex[]> ffts;
@@ -31,38 +31,6 @@ namespace AudioAnalysis
         private const int default_overlap = 20; //stepSizes per Window length
 
         private double[] default_window = FftSharp.Window.Hanning(default_Fftsize);
-
-
-        public double[] GetAudioDouble()
-        {
-            List<Complex[]> ffts_copy = DeepCopyFFTs();
-            return Fourier.ISTFT(ffts_copy, stepSize, window);
-        }
-
-        public float[] GetAudioFloat()
-        {
-            double[] audioD = GetAudioDouble();
-            float[] audioF = new float[audioD.Length];
-            for(int i = 0; i < audioF.Length; i++) audioF[i] = (float)audioD[i];
-
-            return audioF;
-        }
-
-        public List<Complex[]> GetFFTs() => ffts;
-
-        //TODO: Consider a better / more "standard" cloning solution
-        public List<Complex[]> DeepCopyFFTs()
-        {
-            List<Complex[]> newList = new List<Complex[]>();
-            foreach (Complex[] fft in ffts)
-            {
-                Complex[] copy = new Complex[fft.Length];
-                for (int i = 0; i < fft.Length; i++)
-                    copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
-                newList.Add(copy);
-            }
-            return newList;
-        }
 
         public FFTs(double[] audio, int sampleRate, int stepSize, double[] window)
         {
@@ -88,5 +56,43 @@ namespace AudioAnalysis
             this.window = window;
         }
 
+        public List<Complex[]> GetFFTs() => ffts;
+
+        public double[] GetAudioDouble()
+        {
+            List<Complex[]> ffts_copy = DeepCopyFFTs();
+            return Fourier.ISTFT(ffts_copy, stepSize, window);
+        }
+
+        public float[] GetAudioFloat()
+        {
+            double[] audioD = GetAudioDouble();
+            float[] audioF = new float[audioD.Length];
+            for(int i = 0; i < audioF.Length; i++) audioF[i] = (float)audioD[i];
+
+            return audioF;
+        }
+
+
+        //TODO: Consider a better / more "standard" cloning solution
+        public List<Complex[]> DeepCopyFFTs()
+        {
+            List<Complex[]> newList = new List<Complex[]>();
+            foreach (Complex[] fft in ffts)
+            {
+                Complex[] copy = new Complex[fft.Length];
+                for (int i = 0; i < fft.Length; i++)
+                    copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+                newList.Add(copy);
+            }
+            return newList;
+        }
+
+        public void SaveToWav(string filename)
+        {
+            float[] audio = GetAudioFloat();
+            using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(sampleRate, 1));
+            writer.WriteSamples(audio, 0, audio.Length);
+        }
     }
 }

@@ -40,7 +40,6 @@ namespace AudioAnalysis
         public static void SaveFFTsToWav(string filename, FFTs stft)
         {
             float[] audio = stft.GetAudioFloat();
-
             using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(stft.sampleRate, 1));
             writer.WriteSamples(audio, 0, audio.Length);
         }
@@ -119,22 +118,6 @@ namespace AudioAnalysis
             return ffts;
         }
 
-
-        /**
-        /// <summary>
-        /// Deep copies and then inverse fast fourier transforms a single FFT
-        /// </summary>
-        /// <param name="fft">Single FFT to inverse. Does not modify its contents.</param>
-        /// <returns></returns>
-        public static Complex[] IFFT(Complex[] fft)
-        {
-            Complex[] buffer = new Complex[fft.Length];
-            for (int i = 0; i < fft.Length; i++)
-                buffer[i] = new Complex(fft[i].Real, fft[i].Imaginary);
-            FftSharp.Transform.IFFT(buffer);
-            return buffer;
-        }
-        */
     }
 
 

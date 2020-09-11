@@ -54,7 +54,7 @@ namespace SpecPlus
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private readonly string[] sampleRates = { "6144", "11000", "22000", "44000" }; //Beyond 22khz is essentially pointless, but, options
+        private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
 
 
@@ -102,7 +102,7 @@ namespace SpecPlus
         {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / 5; //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize / 8; //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -165,15 +165,18 @@ namespace SpecPlus
             if (!specPaused)
                 TogglePause();
 
-            SaveFileDialog saveFile = new SaveFileDialog();
-            saveFile.Filter = "wav files(*.wav)| *.wav| All files(*.*) | *.* ";
-            saveFile.FilterIndex = 1;
+            SaveFileDialog saveFile = new SaveFileDialog
+            {
+                Filter = "wav files(*.wav)| *.wav| All files(*.*) | *.* ",
+                FilterIndex = 1
+            };
+
             if ((bool)saveFile.ShowDialog())
             {
                 string filename = saveFile.FileName;
                 FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
                 Filter.ApplyFilter(stft, AudioFilters.NoFilter);
-                Fourier.SaveFFTsToWav(filename, stft);
+                stft.SaveToWav(filename);
             }
         }
 
