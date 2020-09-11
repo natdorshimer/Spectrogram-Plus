@@ -105,7 +105,7 @@ namespace SpecPlus
         {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / 10; //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize / 5; //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -278,7 +278,10 @@ namespace SpecPlus
             if ((bool)saveFile.ShowDialog())
             {
                 string filename = saveFile.FileName;
-                Fourier.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+                FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+                Filter.ApplyFilter(stft, AudioFilters.NoFilter);
+                Fourier.SaveFFTsToWav(filename, stft);
+               // Fourier.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
             }
         }
 

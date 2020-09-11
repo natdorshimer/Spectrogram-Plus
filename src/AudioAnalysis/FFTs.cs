@@ -24,19 +24,14 @@ namespace AudioAnalysis
         public int sampleRate { get; private set; }
         public int stepSize { get; private set; }
 
+        public int FreqResolution => sampleRate / window.Length;
+
         private const int default_Fftsize = 1024;
 
         private const int default_overlap = 20; //stepSizes per Window length
 
         private double[] default_window = FftSharp.Window.Hanning(default_Fftsize);
 
-        public FFTs(List<Complex[]> fft_list, double[] window, int sampleRate, int stepSize)
-        {
-            ffts = fft_list;
-            this.window = window;
-            this.sampleRate = sampleRate;
-            this.stepSize = stepSize;
-        }
 
         public double[] GetAudioDouble()
         {
@@ -53,7 +48,7 @@ namespace AudioAnalysis
             return audioF;
         }
 
-        public List<Complex[]> GetFFTs => ffts;
+        public List<Complex[]> GetFFTs() => ffts;
 
         //TODO: Consider a better / more "standard" cloning solution
         public List<Complex[]> DeepCopyFFTs()
@@ -64,6 +59,7 @@ namespace AudioAnalysis
                 Complex[] copy = new Complex[fft.Length];
                 for (int i = 0; i < fft.Length; i++)
                     copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+                newList.Add(copy);
             }
             return newList;
         }

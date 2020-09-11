@@ -16,8 +16,10 @@ namespace AudioAnalysis
     */
     public static class Fourier
     {
+
         public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)
         {
+
             //Deep copy the complex ffts into a new buffer to safely transform
             List<Complex[]> buffers = new List<Complex[]>();
             foreach (Complex[] arr in ffts)
