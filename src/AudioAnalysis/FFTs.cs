@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using FftSharp;
 
-namespace SpectrogramAnalysis
+namespace AudioAnalysis
 {
     public class FFTs
     {
@@ -38,7 +38,7 @@ namespace SpectrogramAnalysis
 
         public double[] GetAudio()
         {
-            return SpecAnalysis.ISTFT(ffts, stepSize, window);
+            return Fourier.ISTFT(ffts, stepSize, window);
         }
 
         public List<Complex[]> GetFFTs => ffts;
@@ -62,7 +62,7 @@ namespace SpectrogramAnalysis
             this.sampleRate = sampleRate;
             this.stepSize = stepSize;
             this.window = window;
-            this.ffts = SpecAnalysis.STFT(audio, stepSize, window);
+            this.ffts = Fourier.STFT(audio, stepSize, window);
             this.window = window;
         }
 
@@ -72,7 +72,7 @@ namespace SpectrogramAnalysis
             this.sampleRate = sampleRate;
             this.window = FftSharp.Window.Hanning(default_Fftsize);
             this.stepSize = this.window.Length / default_overlap;
-            this.ffts = SpecAnalysis.STFT(audio, stepSize, window);
+            this.ffts = Fourier.STFT(audio, stepSize, window);
         }
 
         public FFTs(List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)

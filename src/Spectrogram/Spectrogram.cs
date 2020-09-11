@@ -10,10 +10,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using Spectrogram_Structures;
 using System.Drawing;
 using FftSharp;
-using SpectrogramAnalysis;
+using AudioAnalysis;
 
 namespace Spectrogram
 {

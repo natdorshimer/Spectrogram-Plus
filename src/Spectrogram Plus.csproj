@@ -27,4 +27,8 @@
     </Resource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Design\" />
+  </ItemGroup>
+
 </Project>

@@ -21,10 +21,9 @@ using System.Reflection;
 using Spectrogram;
 using System.IO;
 using System.Globalization;
-using Spectrogram_Structures;
 using System.CodeDom;
 using NAudio.Wave.SampleProviders;
-using SpectrogramAnalysis;
+using AudioAnalysis;
 using Microsoft.Win32;
 
 /**
@@ -279,7 +278,7 @@ namespace SpecPlus
             if ((bool)saveFile.ShowDialog())
             {
                 string filename = saveFile.FileName;
-                SpecAnalysis.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+                Fourier.SaveFFTsToWav(filename, spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
             }
         }
 

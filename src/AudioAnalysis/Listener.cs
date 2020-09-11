@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SpecPlus
+namespace AudioAnalysis
 {
     public class Listener : IDisposable
     {

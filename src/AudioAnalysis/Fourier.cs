@@ -14,13 +14,11 @@ using System.Windows;
  * Audio processing tools used for processing of voice. 
  * The heart lies at ISTFT, which allows me to convert from the Fourier Domain back into the Time Domain
  */
-namespace SpectrogramAnalysis
+namespace AudioAnalysis
 {
-    
 
-    public class SpecAnalysis
+    public static class Fourier
     {
-
         public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)
         {
             //Deep copy the complex ffts into a new buffer to safely transform
@@ -34,7 +32,7 @@ namespace SpectrogramAnalysis
 
             double[] audioD = ISTFT(ffts, stepSize, window);
             float[] audio = new float[audioD.Length];
-            for (int i = 0; i < audio.Length; i++) audio[i] = (float) audioD[i];
+            for (int i = 0; i < audio.Length; i++) audio[i] = (float)audioD[i];
 
             using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(sampleRate, 1));
             writer.WriteSamples(audio, 0, audio.Length);
@@ -72,7 +70,7 @@ namespace SpectrogramAnalysis
              */
 
             double[] data = new double[window.Length + ffts.Count * stepSize];
-            for(int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
+            for (int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
             {
                 Complex[] buffer = ffts[windowed_block];
                 Transform.IFFT(buffer); //Get the inverse fourier transform of the buffer
@@ -80,7 +78,7 @@ namespace SpectrogramAnalysis
                 for (int j = 0; j < buffer.Length; j++)
                     data[data_index + j] += buffer[j].Real * window[j] / data.Length;
             }
-            
+
             return data;
         }
 
@@ -111,6 +109,24 @@ namespace SpectrogramAnalysis
 
             return ffts;
         }
+
+
+        /**
+        /// <summary>
+        /// Deep copies and then inverse fast fourier transforms a single FFT
+        /// </summary>
+        /// <param name="fft">Single FFT to inverse. Does not modify its contents.</param>
+        /// <returns></returns>
+        public static Complex[] IFFT(Complex[] fft)
+        {
+            Complex[] buffer = new Complex[fft.Length];
+            for (int i = 0; i < fft.Length; i++)
+                buffer[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+            FftSharp.Transform.IFFT(buffer);
+            return buffer;
+        }
+        */
     }
+
 
 }
