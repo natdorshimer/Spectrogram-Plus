@@ -24,7 +24,7 @@ using System.Globalization;
 using Spectrogram_Structures;
 using System.CodeDom;
 using NAudio.Wave.SampleProviders;
-using SpectrogramAnalysisTools;
+using SpectrogramAnalysis;
 using Microsoft.Win32;
 
 /**
@@ -92,6 +92,7 @@ namespace SpecPlus
             SpecGrid.MaxWidth = this.ActualWidth - ControlsGrid.ActualWidth - rightMargin;
             SpecGrid.MaxHeight = this.ActualHeight;
             scrollViewerSpec.MaxHeight = this.ActualHeight - 60;
+           
             spec.SetFixedWidth((int)SpecGrid.MaxWidth - 55);
 
             spec.Process();
@@ -239,6 +240,8 @@ namespace SpecPlus
             specTimer.Tick += new EventHandler(specTimer_tick);
             specTimer.Start();
 
+            
+
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
@@ -267,7 +270,9 @@ namespace SpecPlus
 
         private void SaveSpectrogram()
         {
-            TogglePause();
+            if(!specPaused) 
+                TogglePause();
+
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.Filter = "wav files(*.wav)| *.wav| All files(*.*) | *.* ";
             saveFile.FilterIndex = 1;

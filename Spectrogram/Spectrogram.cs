@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using Spectrogram_Structures;
 using System.Drawing;
 using FftSharp;
-using SpectrogramAnalysisTools;
+using SpectrogramAnalysis;
 
 namespace Spectrogram
 {
@@ -316,38 +316,5 @@ namespace Spectrogram
     /**
      * Kind of like a mini-spectrogram class that I'll be using for audio analysis
      */
-    public class FFTs
-    {
-        private List<Complex[]> ffts;
-        public double[] window { get; private set; }
-        public int sampleRate { get; private set; }
-        public int stepSize { get; private set; }
-
-        public FFTs(List<Complex[]> fft_list, double[] window, int sampleRate, int stepSize)
-        {
-            ffts = fft_list;
-            this.window = window;
-            this.sampleRate = sampleRate;
-            this.stepSize = stepSize;
-        }
-
-        public double[] GetAudio()
-        {
-            return SpecAnalysis.ISTFT(ffts, stepSize, window);
-        }
-
-        public List<Complex[]> GetFFTs => ffts;
-
-        //Produces a deep copy of the FFTs
-        public List<Complex[]> DeepCopyFFTs() {
-            List<Complex[]> newList = new List<Complex[]>();
-            foreach (Complex[] fft in ffts)
-            {
-                Complex[] copy = new Complex[fft.Length];
-                for (int i = 0; i < fft.Length; i++)
-                    copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
-            }
-            return newList;
-        }
-    }
+    
 }

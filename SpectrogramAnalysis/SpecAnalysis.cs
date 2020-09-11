@@ -8,13 +8,16 @@ using System.Threading.Tasks;
 using Spectrogram;
 using NAudio.Wave;
 using Microsoft.VisualBasic.CompilerServices;
+using System.Windows;
 
 /**
  * Audio processing tools used for processing of voice. 
  * The heart lies at ISTFT, which allows me to convert from the Fourier Domain back into the Time Domain
  */
-namespace SpectrogramAnalysisTools
+namespace SpectrogramAnalysis
 {
+    
+
     public class SpecAnalysis
     {
 
@@ -75,12 +78,39 @@ namespace SpectrogramAnalysisTools
                 Transform.IFFT(buffer); //Get the inverse fourier transform of the buffer
                 int data_index = windowed_block * stepSize;
                 for (int j = 0; j < buffer.Length; j++)
-                    data[data_index + j] += buffer[j].Real * window[j] / data.Length; 
+                    data[data_index + j] += buffer[j].Real * window[j] / data.Length;
             }
             
             return data;
         }
 
+
+
+        public static List<Complex[]> STFT(double[] audio, int stepSize, double[] window)
+        {
+            /**
+             * Short Term Fourier Transform 
+             * Requires testing
+             */
+            int num_blocks = (audio.Length - window.Length) / stepSize;
+            if (num_blocks < 1)
+                return null; //window too large or stepSize too large to get a single windowed block out of it
+
+            List<Complex[]> ffts = new List<Complex[]>();
+
+            Parallel.For(0, num_blocks, windowed_block =>
+            {
+                FftSharp.Complex[] buffer = new FftSharp.Complex[window.Length];
+                int sourceIndex = windowed_block * stepSize;
+                for (int i = 0; i < window.Length; i++)
+                    buffer[i].Real = audio[sourceIndex + i] * window[i];
+                FftSharp.Transform.FFT(buffer);
+
+                ffts.Add(buffer);
+            });
+
+            return ffts;
+        }
     }
 
 }
