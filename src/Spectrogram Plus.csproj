@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>WPF_Practice</RootNamespace>
+    <RootNamespace>Spectrogram_Plus</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>SpecPlusIcon.ico</ApplicationIcon>
     <PackageIcon>icon.PNG</PackageIcon>

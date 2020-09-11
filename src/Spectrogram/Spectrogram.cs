@@ -311,9 +311,5 @@ namespace Spectrogram
             return (peakFreqHz, peakMagnitude);
         }
     }
-
-    /**
-     * Kind of like a mini-spectrogram class that I'll be using for audio analysis
-     */
     
 }
