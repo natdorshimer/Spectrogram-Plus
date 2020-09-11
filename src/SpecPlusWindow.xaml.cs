@@ -196,9 +196,9 @@ namespace SpecPlus
 
             PaintGrid.Children.Add(selectedWindowToDraw);
 
-            UpdateSelectedSpecWindow();
             selectedWindowStartPoint = startPoint;
             selectedWindowEndPoint = startPoint;
+            UpdateSelectedSpecWindow();
         }
 
         private void UpdateSelectedSpecWindow()
