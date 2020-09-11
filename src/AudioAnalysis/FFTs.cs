@@ -9,12 +9,14 @@ namespace AudioAnalysis
     {
         /**
          * See: http://eeweb.poly.edu/iselesni/EL713/STFT/stft_inverse.pdf
-         * FFts contains information about the Short-Term-Fourier-Transform representation of a signal
+         * FFts contains information about the Short-Time-Fourier-Transform representation of a signal
          * It is essentially the fourier transform of overlapping, windowed blocks of a signal
          * 
          * This allows us to obtain a fourier transform as a function of frequency AND time, S(w, t) instead of being solely dependent on frequency. 
          *      This representation of audio is most akin to how our ears actually interperet audio. They work by sampling the FFT of the sound it hears, which is a function of time
          *      This also allows us to perform signal processing on small windows of time.
+
+         * TODO: Consider making a save function in this class instead of it being external.
          */
 
         private List<Complex[]> ffts;
@@ -36,14 +38,24 @@ namespace AudioAnalysis
             this.stepSize = stepSize;
         }
 
-        public double[] GetAudio()
+        public double[] GetAudioDouble()
         {
-            return Fourier.ISTFT(ffts, stepSize, window);
+            List<Complex[]> ffts_copy = DeepCopyFFTs();
+            return Fourier.ISTFT(ffts_copy, stepSize, window);
+        }
+
+        public float[] GetAudioFloat()
+        {
+            double[] audioD = GetAudioDouble();
+            float[] audioF = new float[audioD.Length];
+            for(int i = 0; i < audioF.Length; i++) audioF[i] = (float)audioD[i];
+
+            return audioF;
         }
 
         public List<Complex[]> GetFFTs => ffts;
 
-        //Produces a deep copy of the FFTs
+        //TODO: Consider a better / more "standard" cloning solution
         public List<Complex[]> DeepCopyFFTs()
         {
             List<Complex[]> newList = new List<Complex[]>();
@@ -56,7 +68,6 @@ namespace AudioAnalysis
             return newList;
         }
 
-        //Converts an audio stream into a list of FFTs 
         public FFTs(double[] audio, int sampleRate, int stepSize, double[] window)
         {
             this.sampleRate = sampleRate;
@@ -65,8 +76,6 @@ namespace AudioAnalysis
             this.ffts = Fourier.STFT(audio, stepSize, window);
             this.window = window;
         }
-
-        //Uses default hanning window and default stepsize calculated from the default amount of overlapping
         public FFTs(double[] audio, int sampleRate)
         {
             this.sampleRate = sampleRate;

@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FftSharp;
-using System.Windows.Threading;
-using System.Threading.Tasks;
-using Spectrogram;
 using NAudio.Wave;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Windows;
 
-/**
- * Audio processing tools used for processing of voice. 
- * The heart lies at ISTFT, which allows me to convert from the Fourier Domain back into the Time Domain
- */
 namespace AudioAnalysis
 {
 
+    /**
+    * Audio processing tools used for processing of voice. 
+    * The heart lies at ISTFT, which allows me to convert from the Fourier Domain back into the Time Domain after doing filtering
+    */
     public static class Fourier
     {
         public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)
@@ -38,14 +35,22 @@ namespace AudioAnalysis
             writer.WriteSamples(audio, 0, audio.Length);
         }
 
+        public static void SaveFFTsToWav(string filename, FFTs stft)
+        {
+            float[] audio = stft.GetAudioFloat();
+
+            using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(stft.sampleRate, 1));
+            writer.WriteSamples(audio, 0, audio.Length);
+        }
+
 
         /// <param name="ffts">List of ffts with a window block separation of stepSize</param>
         /// <param name="stepSize">The step size the window took when constructing the ffts</param>
-        /// <param name="window">Window used to create the ffts originally. Need to ISTFT them back.</param>
+        /// <param name="window">Window used to create the ffts originally. Needed to ISTFT them back.</param>
         public static double[] ISTFT(List<Complex[]> ffts, int stepSize, double[] window)
         {
             /**
-             * Inverse Short Term Fourier Transform
+             * Inverse Short Time Fourier Transform
              * See: http://eeweb.poly.edu/iselesni/EL713/STFT/stft_inverse.pdf
              * 
              * In our case, the window length N is also the size of each ffts array.
@@ -82,30 +87,32 @@ namespace AudioAnalysis
             return data;
         }
 
-
-
         public static List<Complex[]> STFT(double[] audio, int stepSize, double[] window)
         {
             /**
-             * Short Term Fourier Transform 
+             * Short Time Fourier Transform 
              * Requires testing
              */
+
+
             int num_blocks = (audio.Length - window.Length) / stepSize;
+
+            //window too large or stepSize too large to get a single windowed block out of it
             if (num_blocks < 1)
-                return null; //window too large or stepSize too large to get a single windowed block out of it
+                return null; 
 
             List<Complex[]> ffts = new List<Complex[]>();
 
-            Parallel.For(0, num_blocks, windowed_block =>
+            for(int windowed_block = 0; windowed_block < num_blocks; windowed_block++)
             {
                 FftSharp.Complex[] buffer = new FftSharp.Complex[window.Length];
                 int sourceIndex = windowed_block * stepSize;
                 for (int i = 0; i < window.Length; i++)
                     buffer[i].Real = audio[sourceIndex + i] * window[i];
-                FftSharp.Transform.FFT(buffer);
 
+                FftSharp.Transform.FFT(buffer);
                 ffts.Add(buffer);
-            });
+            }
 
             return ffts;
         }
