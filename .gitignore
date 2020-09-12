@@ -5,6 +5,8 @@
 
 # Custom Settings
 
+ExtResources\*
+ExtResources*
 
 # User-specific files
 *.rsuser
