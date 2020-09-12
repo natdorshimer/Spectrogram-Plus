@@ -131,7 +131,7 @@ namespace Spectrogram
 
                 newFfts[newFftIndex] = new double[settings.Height];
                 for (int i = 0; i < settings.Height; i++) {
-                    newFfts[newFftIndex][i] = buffer[settings.FftIndex1 + i].Magnitude/settings.FftSize;
+                    newFfts[newFftIndex][i] = buffer[settings.FftIndex1 + i].Magnitude / (settings.FftSize);
                 }
             });
 

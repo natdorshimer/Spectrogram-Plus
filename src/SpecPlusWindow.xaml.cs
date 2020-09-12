@@ -54,6 +54,7 @@ namespace SpecPlus
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
+        private const int step_fraction = 8;
         private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
 
@@ -102,7 +103,7 @@ namespace SpecPlus
         {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / 8; //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize / (cbStepFraction.SelectedIndex+2); //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -123,7 +124,7 @@ namespace SpecPlus
         {
             foreach (string sr in sampleRates)
                 cbSampleRate.Items.Add(sr);
-            cbSampleRate.SelectedIndex = 1;
+            cbSampleRate.SelectedIndex = 2;
 
 
             //Init mic inputs into the combo box
@@ -142,9 +143,15 @@ namespace SpecPlus
             }
 
             //Init fft settings
-            for (int i = 9; i < 12; i++)
+            for (int i = 9; i < 14; i++)
                 cbFFTsize.Items.Add($"2^{i} ({1 << i:N0})");
             cbFFTsize.SelectedIndex = 1;
+
+            //Init fft settings
+            for (int i = 2; i < 10; i++)
+                cbStepFraction.Items.Add($"{i}");
+            cbStepFraction.SelectedIndex = 6;
+
 
             //Init colormaps
             cmaps = Colormap.GetColormaps();
@@ -155,9 +162,20 @@ namespace SpecPlus
 
             //Timer used to continously update the spectrogram with new data
             specTimer = new DispatcherTimer();
-            specTimer.Interval = TimeSpan.FromMilliseconds(15);
+            specTimer.Interval = TimeSpan.FromMilliseconds(5);
             specTimer.Tick += new EventHandler(SpecTimer_tick);
             specTimer.Start();
+        }
+
+        private void LinearFrequencyShifterMulti(FFTs stft)
+        {
+            string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
+            for (int i = 0; i <= 20; i++)
+            {
+                string end = $"{i}.wav";
+                if(i > 0) Filter.LinearFrequencyShifter(stft, 100);
+                stft.SaveToWav(filename+end);
+            }
         }
 
         private void SaveSpectrogram()
@@ -173,10 +191,12 @@ namespace SpecPlus
 
             if ((bool)saveFile.ShowDialog())
             {
+                
                 string filename = saveFile.FileName;
                 FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-                Filter.ApplyFilter(stft, AudioFilters.NoFilter);
-                stft.SaveToWav(filename);
+                //Filter.LinearFrequencyShifter(stft, 500);
+                //stft.SaveToWav(filename);
+                LinearFrequencyShifterMulti(stft);
             }
         }
 
@@ -223,6 +243,8 @@ namespace SpecPlus
         private void cbFFTsize_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
 
         private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+
+        private void cbStepFraction_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
 
         private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
 

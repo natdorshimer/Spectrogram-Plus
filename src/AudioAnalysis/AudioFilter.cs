@@ -1,6 +1,8 @@
 ﻿using FftSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace AudioAnalysis
 {
@@ -66,6 +68,23 @@ namespace AudioAnalysis
                     }
                 }
             }
+        }
+
+        public static void LinearFrequencyShifter(FFTs data, int freq_shift)
+        {
+            int index_shift = freq_shift / data.FreqResolution;
+            if (index_shift < 1)
+                return;
+
+            List<Complex[]> ffts = data.GetFFTs();
+            foreach (Complex[] fft in ffts)
+            {
+                for (int i = fft.Length - 1; i >= index_shift; i--)
+                {
+                    fft[i] = fft[i - index_shift];
+                }
+            }
+            
         }
     }
 }
