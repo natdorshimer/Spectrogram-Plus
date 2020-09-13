@@ -56,7 +56,7 @@ namespace Spectrogram
 
             // horizontal
             StepLengthSec = (double)StepSize / sampleRate;
-            Window = Fourier.SqrtHanning(fftSize);
+            Window = Fourier.Window.RootHann(fftSize);
             StepOverlapSec = FftLengthSec - StepLengthSec;
             StepOverlapFrac = StepOverlapSec / FftLengthSec;
         }

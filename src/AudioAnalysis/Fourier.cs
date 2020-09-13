@@ -20,7 +20,6 @@ namespace AudioAnalysis
 
         public static void SaveFFTsToWav(string filename, List<Complex[]> ffts, int sampleRate, int stepSize, double[] window)
         {
-
             //Deep copy the complex ffts into a new buffer to safely transform
             List<Complex[]> buffers = new List<Complex[]>();
             foreach (Complex[] arr in ffts)
@@ -73,7 +72,7 @@ namespace AudioAnalysis
              * 3. The length of the data array will the total number of elements in ffts divided by the stepsize, ffts.Count*FftSize/stepSize
              * 
              * 
-             * TODO: The playbacked quality isn't as good as it could be
+             * TODO: The playback quality isn't as good as it could be
              * TODO: Implement testing to assert that the deviated quality is within standards
              */
 
@@ -120,12 +119,23 @@ namespace AudioAnalysis
             return ffts;
         }
 
-        public static double[] SqrtHanning(int windowSize)
+        public static class Window
         {
-            double[] window = FftSharp.Window.Hanning(windowSize);
-            for (int i = 0; i < windowSize; i++)
-                window[i] = Math.Sqrt(window[i]);
-            return window;
+            public static double[] RootHann(int windowSize)
+            {
+                double[] window = FftSharp.Window.Hanning(windowSize);
+                for (int i = 0; i < windowSize; i++)
+                    window[i] = Math.Sin((i + 0.5) * Math.PI / windowSize);
+                return window;
+            }
+
+            public static double[] Hann(int windowSize)
+            {
+                double[] window = FftSharp.Window.Hanning(windowSize);
+                for (int i = 0; i < windowSize; i++)
+                    window[i] = Math.Pow(Math.Sin((i + 0.5) * Math.PI / windowSize), 2);
+                return window;
+            }
         }
 
     }

@@ -165,10 +165,8 @@ namespace SpecPlus
             specTimer.Interval = TimeSpan.FromMilliseconds(5);
             specTimer.Tick += new EventHandler(SpecTimer_tick);
             specTimer.Start();
-
-            initialized = true;
         }
-        private bool initialized = false;
+
         private void LinearFrequencyShifterMulti(FFTs stft)
         {
             string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
