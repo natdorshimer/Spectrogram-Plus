@@ -1,9 +1,8 @@
-import matplotlib
-def isCOLA(window, frames, stepSize):
-    """
-    Determines if a given window is COLA compliant
 
-    COLA compliancy is defined as: Sum(w(n-mR),m) = 1, for all n in Integers
+def printCOLA(window, frames, stepSize):
+    """
+    Prints the recombination of the window function. The ideal is a combination of window, frames, and 
+    stepsize to achieve uniformity of 1 over the entire array (except for end points)
     """
 
     data = [0 for i in range(len(window) + frames*stepSize)]
@@ -21,4 +20,4 @@ def sqrt_hann(length):
     return [(math.sin(math.pi*i/length)) for i in range(length)]
 
 
-isCOLA(hann(33), 5, 16)
+printCOLA(hann(33), 5, 16)
