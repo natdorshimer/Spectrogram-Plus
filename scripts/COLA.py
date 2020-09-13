@@ -40,8 +40,8 @@ def isCOLA(window, frames, stepSize):
 def COLA_info(window, frames, stepSize):
 
     # COLA sum
-    data = [0 for i in range(len(window) + frames*stepSize)]
-    for m in range(0,frames+1):
+    data = [0 for i in range(len(window) + (frames-1)*stepSize)]
+    for m in range(0, frames):
         frame_index = m*stepSize
         for j in range(len(window)):
             data[frame_index+j] += window[j]
@@ -54,7 +54,7 @@ def COLA_info(window, frames, stepSize):
     avg_val = sum(data)/len(data)
     for i in range(len(data)):
         flatness += math.pow((data[i]-avg_val), 2)
-    flatness = round(math.sqrt(flatness)/frames, 2)
+    flatness = round(math.sqrt(flatness)/(frames), 2)
 
     return (data, median, flatness)
 
