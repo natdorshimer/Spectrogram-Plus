@@ -8,7 +8,7 @@ def plotCOLA(window_name, window, frames, stepSize):
 
     """
     Plots the COLA of the given window and saves the plot to either 
-    .\COLA\valid_windows or .\COLA\invalid_windows
+    .\COLA\valid_windows\ or .\COLA\invalid_windows\
     """
 
     data = [0 for i in range(len(window) + frames*stepSize)]
@@ -56,6 +56,8 @@ def main(args):
     """
     Command line argument structure: 
     python COLA.py window_type window_length frames stepSize
+
+    See window_map for valid window_types
     """
     window_type = args[0]
     name = window_map[window_type][0]
