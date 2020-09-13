@@ -54,7 +54,7 @@ namespace SpecPlus
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private const int step_fraction = 8;
+        private int step_fraction = 20;
         private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
 
@@ -100,10 +100,10 @@ namespace SpecPlus
          * Sets up a listener for the selected microphone and initializes a spectrogram display
          */
         public void StartListening()
-        {
+    {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / (cbStepFraction.SelectedIndex+2); //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize / (step_fraction); //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -148,9 +148,9 @@ namespace SpecPlus
             cbFFTsize.SelectedIndex = 1;
 
             //Init fft settings
-            for (int i = 2; i < 10; i++)
+            for (int i = 1; i < 10; i++)
                 cbStepFraction.Items.Add($"{i}");
-            cbStepFraction.SelectedIndex = 6;
+            cbStepFraction.SelectedIndex = 7;
 
 
             //Init colormaps
@@ -165,8 +165,10 @@ namespace SpecPlus
             specTimer.Interval = TimeSpan.FromMilliseconds(5);
             specTimer.Tick += new EventHandler(SpecTimer_tick);
             specTimer.Start();
-        }
 
+            initialized = true;
+        }
+        private bool initialized = false;
         private void LinearFrequencyShifterMulti(FFTs stft)
         {
             string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
@@ -305,5 +307,13 @@ namespace SpecPlus
             }
         }
 
+        private void TextBoxStepFraction_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Int32.TryParse(TextBoxStepFraction.Text, out step_fraction);
+                StartListening();
+            }
+        }
     }
 }

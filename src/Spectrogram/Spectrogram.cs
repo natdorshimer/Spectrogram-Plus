@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using FftSharp;
 using AudioAnalysis;
+using NAudio.Wave;
 
 namespace Spectrogram
 {
@@ -111,6 +112,7 @@ namespace Spectrogram
         }
 
 
+        //Modified to be equivalent to Fourier.STFT code.
         public double[][] Process()
         {
             if (FftsToProcess < 1)
@@ -124,14 +126,14 @@ namespace Spectrogram
                 FftSharp.Complex[] buffer = new FftSharp.Complex[settings.FftSize];
                 int sourceIndex = newFftIndex * settings.StepSize;
                 for (int i = 0; i < settings.FftSize; i++)
-                    buffer[i].Real = newAudio[sourceIndex + i] * settings.Window[i];
+                    buffer[i].Real = newAudio[sourceIndex + i] * settings.Window[i] / settings.FftSize;
 
                 FftSharp.Transform.FFT(buffer);
                 ffts_complex.Add(buffer);
 
                 newFfts[newFftIndex] = new double[settings.Height];
                 for (int i = 0; i < settings.Height; i++) {
-                    newFfts[newFftIndex][i] = buffer[settings.FftIndex1 + i].Magnitude / (settings.FftSize);
+                    newFfts[newFftIndex][i] = buffer[i].Magnitude;
                 }
             });
 

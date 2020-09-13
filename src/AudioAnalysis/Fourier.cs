@@ -6,6 +6,7 @@ using FftSharp;
 using NAudio.Wave;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace AudioAnalysis
 {
@@ -71,6 +72,7 @@ namespace AudioAnalysis
              * 2. Summate each array into one final double array
              * 3. The length of the data array will the total number of elements in ffts divided by the stepsize, ffts.Count*FftSize/stepSize
              * 
+             * 
              * TODO: The playbacked quality isn't as good as it could be
              * TODO: Implement testing to assert that the deviated quality is within standards
              */
@@ -79,10 +81,10 @@ namespace AudioAnalysis
             for (int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
             {
                 Complex[] buffer = ffts[windowed_block];
-                Transform.IFFT(buffer); //Get the inverse fourier transform of the buffer
+                Transform.IFFT(buffer); 
                 int data_index = windowed_block * stepSize;
                 for (int j = 0; j < buffer.Length; j++)
-                    data[data_index + j] += buffer[j].Real * window[j] / data.Length;
+                    data[data_index + j] += buffer[j].Real * window[j] / window.Length ;
             }
 
             return data;
@@ -92,7 +94,7 @@ namespace AudioAnalysis
         {
             /**
              * Short Time Fourier Transform 
-             * Requires testing
+             * We do normalization (1/N) on the inverse transform instead of the forward transform. 
              */
 
 
@@ -104,7 +106,7 @@ namespace AudioAnalysis
 
             List<Complex[]> ffts = new List<Complex[]>();
 
-            for(int windowed_block = 0; windowed_block < num_blocks; windowed_block++)
+            Parallel.For(0, num_blocks, windowed_block =>
             {
                 FftSharp.Complex[] buffer = new FftSharp.Complex[window.Length];
                 int sourceIndex = windowed_block * stepSize;
@@ -113,12 +115,19 @@ namespace AudioAnalysis
 
                 FftSharp.Transform.FFT(buffer);
                 ffts.Add(buffer);
-            }
+            });
 
             return ffts;
         }
 
-    }
+        public static double[] SqrtHanning(int windowSize)
+        {
+            double[] window = FftSharp.Window.Hanning(windowSize);
+            for (int i = 0; i < windowSize; i++)
+                window[i] = Math.Sqrt(window[i]);
+            return window;
+        }
 
+    }
 
 }

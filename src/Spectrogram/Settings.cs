@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AudioAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -55,7 +56,7 @@ namespace Spectrogram
 
             // horizontal
             StepLengthSec = (double)StepSize / sampleRate;
-            Window = FftSharp.Window.Hanning(fftSize);
+            Window = Fourier.SqrtHanning(fftSize);
             StepOverlapSec = FftLengthSec - StepLengthSec;
             StepOverlapFrac = StepOverlapSec / FftLengthSec;
         }

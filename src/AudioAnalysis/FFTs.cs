@@ -30,7 +30,9 @@ namespace AudioAnalysis
 
         private const int default_overlap = 20; //stepSizes per Window length
 
-        private double[] default_window = FftSharp.Window.Hanning(default_Fftsize);
+        private double[] default_window = Fourier.SqrtHanning(default_Fftsize);
+
+        
 
         public FFTs(double[] audio, int sampleRate, int stepSize, double[] window)
         {
