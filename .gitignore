@@ -8,6 +8,7 @@
 ExtResources\*
 ExtResources*
 invalid_windows*
+.vscode*
 
 
 # User-specific files
