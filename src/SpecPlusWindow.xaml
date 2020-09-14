@@ -32,6 +32,8 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Column="1" Grid.Row = "1" FontSize="30" Text="Spectrogram"
                        Grid.ColumnSpan="3" Margin="0,0,0,15"/>
@@ -64,20 +66,22 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="0,0,0,10"
-                    Maximum="15" Value="7.5"/>
-            <TextBox x:Name="TextBoxWhiteNoise" Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="8" KeyDown="TextBoxWhiteNoise_KeyDown" />
-            <Button x:Name="PauseButton" Grid.Row="8" Grid.Column="2" Click="PauseButton_Click">
-                <TextBlock x:Name="PauseButtonText" Text="Pause"></TextBlock>
-            </Button>
-            <ComboBox x:Name="cbStepFraction" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="0,0,0,10" SelectionChanged="cbStepFraction_SelectionChanged">
+            <ComboBox x:Name="cbOverlap" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="0,0,0,10" SelectionChanged="cbOverlap_SelectionChanged">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text ="{Binding Mode=OneWay}"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBox x:Name="TextBoxStepFraction" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="0,0,0,10" KeyDown="TextBoxStepFraction_KeyDown" />
+            <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="0,0,0,10"
+                    Maximum="15" Value="7.5"/>
+            <TextBox x:Name="TextBoxWhiteNoise" Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="8" KeyDown="TextBoxWhiteNoise_KeyDown" />
+            <Button x:Name="PauseButton" Grid.Row="8" Grid.Column="2" Click="PauseButton_Click">
+                <TextBlock x:Name="PauseButtonText" Text="Pause"></TextBlock>
+            </Button>
+            <TextBlock x:Name="MousePosition" Grid.Row="9" Grid.Column="1">
+                "0,0"
+            </TextBlock>
         </Grid>
         <Grid x:Name="SpecGrid"  Grid.Row="0" Grid.Column="1">
             <Grid.ColumnDefinitions>
@@ -91,14 +95,11 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer x:Name ="scrollViewerSpec" VerticalScrollBarVisibility="Visible"  HorizontalScrollBarVisibility="Visible" Grid.Row ="1" Grid.Column="1"  Margin="20,0,0,20" ScrollChanged="scrollViewerSpec_ScrollChanged">
-                <Grid x:Name="PaintGrid" MouseLeftButtonDown="PaintGrid_MouseLeftButtonDown" MouseLeftButtonUp="PaintGrid_MouseLeftButtonUp" MouseRightButtonDown="PaintGrid_MouseRightButtonDown">
+                <Grid x:Name="PaintGrid" MouseLeftButtonDown="PaintGrid_MouseLeftButtonDown" MouseLeftButtonUp="PaintGrid_MouseLeftButtonUp" MouseRightButtonDown="PaintGrid_MouseRightButtonDown" MouseWheel="PaintGrid_MouseWheel">
                     <Image x:Name="imageSpec" MouseMove="PaintGrid_MouseMove"  />
                 </Grid>
             </ScrollViewer>
-            <TextBlock x:Name="MousePosition" Grid.Row="3" Grid.Column="1">
-                "0,0"
-            </TextBlock>
-            
+
         </Grid>
     </Grid>
 </Window>

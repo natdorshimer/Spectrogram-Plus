@@ -83,7 +83,7 @@ namespace AudioAnalysis
                 Transform.IFFT(buffer); 
                 int data_index = windowed_block * stepSize;
                 for (int j = 0; j < buffer.Length; j++)
-                    data[data_index + j] += buffer[j].Real * window[j] / window.Length * 2 ;
+                    data[data_index + j] += buffer[j].Real * window[j] / window.Length;
             }
 
             return data;

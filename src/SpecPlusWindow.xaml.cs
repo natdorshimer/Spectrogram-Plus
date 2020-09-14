@@ -25,7 +25,8 @@ using System.CodeDom;
 using NAudio.Wave.SampleProviders;
 using AudioAnalysis;
 using Microsoft.Win32;
-
+using FftSharp;
+using NAudio.Wave;
 /**
  * Next Tasks:
  * 1. Implement saving feature to save the select window (or the spectrogram itself)
@@ -37,7 +38,7 @@ namespace SpecPlus
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class SpecPlusWindow : Window
+    public partial class SpecPlusWindow : System.Windows.Window
     {
         private Spectrogram.Spectrogram spec; //Spectrogram
         private Colormap[] cmaps;             //Colormaps for spectrogram display
@@ -51,12 +52,19 @@ namespace SpecPlus
         private bool selectedWindowShouldDraw = false; //Determines if the selectedWindowToDraw should continue updating its position 
         private Rectangle selectedWindowToDraw = new Rectangle(); //This is the rectangle that shows the area of the spectrogram selected
 
+        private int freq_resolution => spec.SampleRate / spec.FftSize;
+        private double time_resolution => 1d / (double)freq_resolution;
+
+        private double time_scale => time_resolution / zoomFactor;
+
+        private double freq_scale => freq_resolution / zoomFactor;
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private int step_fraction = 20;
+        private double overlap = 0.5;
         private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
+        private double zoomFactor = 1;
 
 
         public SpecPlusWindow()
@@ -67,20 +75,17 @@ namespace SpecPlus
 
         private void SpecTimer_tick(object sender, EventArgs e)
         {
-
-            //Get new audio from the microphone for the spectrogram to process
             double[] newAudio = listener.GetNewAudio();
             if (!specPaused)
                 spec.Add(newAudio, process: false);
+            spec.Process();
+            DisplaySpectrogram();
 
-            //Update window components
-            if (spec.FftsToProcess > 0)
-                ProcessAndDisplaySpectrogram();
             if (selectedWindowShouldDraw)
                 UpdateSelectedSpecWindow();
         }
 
-        private void ProcessAndDisplaySpectrogram()
+        private void DisplaySpectrogram()
         {
             //Display Settings
             //TODO: Clean up GUI code
@@ -90,10 +95,10 @@ namespace SpecPlus
             SpecGrid.MaxHeight = this.ActualHeight;
             scrollViewerSpec.MaxHeight = this.ActualHeight - 60;
 
-            spec.SetFixedWidth((int)SpecGrid.MaxWidth - 55);
-
-            spec.Process();
-            imageSpec.Source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
+            spec.SetFixedWidth((int)((SpecGrid.MaxWidth - 55) / zoomFactor));
+            BitmapSource source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
+            TransformedBitmap trans = new TransformedBitmap(source, new ScaleTransform(zoomFactor, zoomFactor));
+            imageSpec.Source = trans;
         }
 
         /**
@@ -103,7 +108,7 @@ namespace SpecPlus
     {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize / (step_fraction); //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize - (int) (fftSize * overlap); //This can change the quality of the ISTFT signal. Keep an eye on this
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
@@ -148,9 +153,9 @@ namespace SpecPlus
             cbFFTsize.SelectedIndex = 1;
 
             //Init fft settings
-            for (int i = 1; i < 10; i++)
-                cbStepFraction.Items.Add($"{i}");
-            cbStepFraction.SelectedIndex = 7;
+            for (int i = 0; i < 10; i++)
+                cbOverlap.Items.Add($"{i}/{(i+1)}");
+            cbOverlap.SelectedIndex = 1;
 
 
             //Init colormaps
@@ -170,7 +175,7 @@ namespace SpecPlus
         private void LinearFrequencyShifterMulti(FFTs stft)
         {
             string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
-            for (int i = 0; i <= 20; i++)
+            for (int i = 0; i <= 5; i++)
             {
                 string end = $"{i}.wav";
                 if(i > 0) Filter.LinearFrequencyShifter(stft, 100);
@@ -198,6 +203,33 @@ namespace SpecPlus
                 //stft.SaveToWav(filename);
                 LinearFrequencyShifterMulti(stft);
             }
+        }
+
+        private void saveSnippet()
+        {
+
+            /**
+             * TODO: Bug: the saved snippet isn't entirely accurate. It does save, but the coordinates are sometimes wrong.
+             */
+
+            //Get the indices of the STFT
+            int fftStartIndex = (int)(selectedWindowStartPoint.X / zoomFactor);
+            int fftEndIndex = (int)(selectedWindowEndPoint.X / zoomFactor);
+            if (fftStartIndex > fftEndIndex)
+            {
+                int temp = fftEndIndex;
+                fftEndIndex = fftStartIndex;
+                fftStartIndex = temp;
+            }
+
+            //Make a snippet from those indices  for easy transforming / saving
+            FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+            List<Complex[]> ffts = stft.DeepCopyFFTs();
+            List<Complex[]> snippet = new List<Complex[]>();
+            FFTs stft_snippet = new FFTs(snippet, stft.sampleRate, stft.stepSize, stft.window);
+            for (int i = fftStartIndex; i <= fftEndIndex; i++)
+                snippet.Add(ffts[i]);
+            stft_snippet.SaveToWav("C:\\Users\\Natalie\\Documents\\wavs\\snips\\test.wav");
         }
 
         private void InitSelectedSpecWindow(Point startPoint)
@@ -244,11 +276,15 @@ namespace SpecPlus
 
         private void cbSampleRate_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
 
-        private void cbStepFraction_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
+        private void cbOverlap_SelectionChanged(object sender, SelectionChangedEventArgs e) => StartListening();
 
         private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
 
-        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e) => scrollViewerSpec.ScrollToRightEnd();
+        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            scrollViewerSpec.ScrollToRightEnd();
+            scrollViewerSpec.ScrollToBottom();
+        }
 
         private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
         {
@@ -260,9 +296,15 @@ namespace SpecPlus
         {
             Point p = e.GetPosition(imageSpec);
             selectedWindowEndPoint = p;
+            int freq_resolution = spec.SampleRate / spec.FftSize;
+            int freq = (int)(freq_resolution * (imageSpec.ActualHeight-p.Y) / zoomFactor);   //hz
+            double time_resolution = 1d / ((double)freq_resolution);
+            double time = ((imageSpec.ActualWidth - p.X) * time_resolution / zoomFactor * 1000); //ms
 
-            MousePosition.Text = (new Point((int)p.X, (int)p.Y)).ToString();
-            
+            if(time > 1000)
+                MousePosition.Text =  $"{freq} Hz,  {Math.Round(time/1000, 2)} s";
+            else
+                MousePosition.Text = $"{freq} Hz,  {(int)time} ms";
         }
 
         private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) 
@@ -301,17 +343,24 @@ namespace SpecPlus
                 case (Key.S):
                     if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
                         SaveSpectrogram();
+                    else
+                        saveSnippet();
                     break;
             }
         }
 
-        private void TextBoxStepFraction_KeyDown(object sender, KeyEventArgs e)
+        private void TextBoxOverlap_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                Int32.TryParse(TextBoxStepFraction.Text, out step_fraction);
+                overlap = cbOverlap.SelectedIndex / (cbOverlap.SelectedIndex + 1);
                 StartListening();
             }
+        }
+
+        private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            zoomFactor += (double)e.Delta / (1000);
         }
     }
 }

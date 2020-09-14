@@ -131,8 +131,8 @@ namespace Spectrogram
                 FftSharp.Transform.FFT(buffer);
                 ffts_complex.Add(buffer);
 
-                newFfts[newFftIndex] = new double[settings.Height];
-                for (int i = 0; i < settings.Height; i++) {
+                newFfts[newFftIndex] = new double[settings.FftSize];
+                for (int i = 0; i < settings.FftSize; i++) {
                     newFfts[newFftIndex][i] = buffer[i].Magnitude;
                 }
             });
@@ -168,7 +168,7 @@ namespace Spectrogram
         }*/
 
         public BitmapSource GetBitmapSource(double intensity = 1, bool dB = false, bool roll = false, double whiteNoiseMin=0) =>
-            Image.GetBitmapSource(ffts, cmap, intensity, dB, roll, NextColumnIndex, whiteNoiseMin);
+            Image.GetBitmapSource(ffts, cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex, whiteNoiseMin);
 
 
         /* Currently deprecated in WPF projects
@@ -177,7 +177,7 @@ namespace Spectrogram
         */
 
         public BitmapSource GetBitmapSourceMel(int melBinCount = 25, double intensity = 1, bool dB = false, bool roll = false) =>
-            Image.GetBitmapSource(GetMelFFTs(melBinCount), cmap, intensity, dB, roll, NextColumnIndex);
+            Image.GetBitmapSource(GetMelFFTs(melBinCount), cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex);
 
 
         /**
@@ -203,7 +203,7 @@ namespace Spectrogram
                 throw new ArgumentException("unknown file extension");
 
 
-            BitmapSource image = Image.GetBitmapSource(ffts, cmap, intensity, dB, roll, NextColumnIndex);
+            BitmapSource image = Image.GetBitmapSource(ffts, cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex);
             encoder.Frames.Add(BitmapFrame.Create(image));
 
             using (var fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create))
@@ -224,7 +224,7 @@ namespace Spectrogram
                         d2[j] = Math.Max(d2[j], d1[j * reduction + k]);
                 ffts2.Add(d2);
             }
-            return Image.GetBitmapSource(ffts2, cmap, intensity, dB, roll, NextColumnIndex);
+            return Image.GetBitmapSource(ffts2, cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex);
         }
 
         public void SaveData(string filePath, int melBinCount = 0)
