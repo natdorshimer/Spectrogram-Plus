@@ -8,7 +8,7 @@ import os
 def plotCOLA(window_name, window, frames, stepSize):
 
     """
-    Plots the COLA of the given window and saves the plot to either 
+    Plots the COLA sum of the given window and saves the plot to either 
     .\\COLA\\valid_windows\ or .\\COLA\\invalid_windows\
     """
 
@@ -32,13 +32,21 @@ def plotCOLA(window_name, window, frames, stepSize):
     plt.savefig(filename)
     os.startfile(filename) 
 
-# Potentially come up with a better "isCOLA" description
-def isCOLA(window, frames, stepSize):
-    data, median = COLA_info(window, frames, stepSize)
+def isCOLA(window, stepSize, frames = 10):
+    """
+    Returns true if it's COLA over a given amount of frames
+    """
+    data, median, flatness = COLA_info(window, frames, stepSize)
     return median == 1
 
 def COLA_info(window, frames, stepSize):
-
+    """
+    Returns:
+        data : the COLA sum of a given window, frames, and overlap
+        median: returns the median value of the COLA sum. 1.0 is a COLA window
+        flatness: "Averaged" standard deviation to somewhat indicate flatness
+    """
+    
     # COLA sum
     data = [0 for i in range(len(window) + (frames-1)*stepSize)]
     for m in range(0, frames):
@@ -59,6 +67,9 @@ def COLA_info(window, frames, stepSize):
     return (data, median, flatness)
 
 def print_COLA_info(window, frames, stepSize):
+    """
+    Prints data about a given window given its overlap and number of frames
+    """
     data, median, flatness = COLA_info(window, frames, stepSize)
     print(f"COLA: {median == 1}")
     print(f"Median: {median}")
@@ -66,9 +77,11 @@ def print_COLA_info(window, frames, stepSize):
     print(f"Overlap: {round(1-stepSize/len(window), 3)*100}%")
 
 def hann(length):
+    """returns a hanning window centered at length/2 with N = length"""
     return [math.pow(math.sin(math.pi*i/length),2) for i in range(length)]
 
 def root_hann(length):
+    """returns the square root of a hanning window centered at length/2 with N = length"""
     return [(math.sin(math.pi*i/length)) for i in range(length)]
 
 # Maps a shorthand name to its full name and its window
@@ -81,10 +94,12 @@ window_map = {
 def main(args):
     """
     Command line argument structure: 
-    python COLA.py window_type window_length frames stepSize -plot
+        python COLA.py window_type window_length frames stepSize -plot
+        If -plot is used at the end then it will plot and save the overlap structure using plotCOLA
 
-    If -plot is used at the end then it will plot and save the overlap structure using plotCOLA
-
+    Example:
+        >> python COLA.py hann 1024 5 512 -plot
+    
     See window_map for valid window_types
     """
     window_type = args[0]
