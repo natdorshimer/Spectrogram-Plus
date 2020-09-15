@@ -32,10 +32,12 @@ namespace Spectrogram
         public int SampleRate { get { return settings.SampleRate; } }
         public int StepSize { get { return settings.StepSize; } }
         public double FreqMax { get { return settings.FreqMax; } }
+        public int NyquistBin => FftSize / 2;
+        public int FreqNyquist => SampleRate / 2;
         public double FreqMin { get { return settings.FreqMin; } }
 
         private readonly Settings settings;
-        private List<double[]> ffts;
+        private List<Complex[]> ffts;
         private List<FftSharp.Complex[]> ffts_complex;
         private readonly List<double> newAudio = new List<double>();
         private Colormap cmap = Colormap.Viridis;
@@ -45,14 +47,13 @@ namespace Spectrogram
             double minFreq = 0, double maxFreq = double.PositiveInfinity,
             int? fixedWidth = null, int offsetHz = 0)
         {
-            ffts = new List<double[]>();
+            ffts = new List<Complex[]>();
             ffts_complex = new List<FftSharp.Complex[]>();
             this.SetColormap(Colormap.Viridis);
             settings = new Settings(sampleRate, fftSize, stepSize, minFreq, maxFreq, offsetHz);
             
             if (fixedWidth.HasValue)
                 SetFixedWidth(fixedWidth.Value);
-
         }
 
 
@@ -81,8 +82,6 @@ namespace Spectrogram
             this.cmap = cmap ?? this.cmap;
         }
 
-        public int GetFftIndex1 () { return settings.FftIndex1; }
-
         public double[] GetWindow(){ return settings.Window; }
 
         public void SetWindow(double[] newWindow)
@@ -106,6 +105,7 @@ namespace Spectrogram
         }
 
         private int rollOffset = 0;
+
         public void RollReset(int offset = 0)
         {
             rollOffset = -FftsProcessed + offset;
@@ -113,14 +113,13 @@ namespace Spectrogram
 
 
         //Modified to be equivalent to Fourier.STFT code.
-        public double[][] Process()
+        public Complex[][] Process()
         {
             if (FftsToProcess < 1)
                 return null;
-
             int newFftCount = FftsToProcess;
-            double[][] newFfts = new double[newFftCount][];
 
+            Complex[][] newFfts = new Complex[newFftCount][];
             Parallel.For(0, newFftCount, newFftIndex =>
             {
                 FftSharp.Complex[] buffer = new FftSharp.Complex[settings.FftSize];
@@ -129,16 +128,19 @@ namespace Spectrogram
                     buffer[i].Real = newAudio[sourceIndex + i] * settings.Window[i] / settings.FftSize;
 
                 FftSharp.Transform.FFT(buffer);
-                ffts_complex.Add(buffer);
-
-                newFfts[newFftIndex] = new double[settings.FftSize];
+                newFfts[newFftIndex] = new Complex[settings.FftSize];
                 for (int i = 0; i < settings.FftSize; i++) {
-                    newFfts[newFftIndex][i] = buffer[i].Magnitude;
+                    newFfts[newFftIndex][i] = buffer[i];
                 }
             });
 
-            foreach (var newFft in newFfts) 
-                ffts.Add(newFft);
+
+
+            for (int i = 0; i < newFftCount; i++)
+            {
+                ffts.Add(newFfts[i]);
+                ffts_complex.Add(newFfts[i]);
+            }
             
             FftsProcessed += newFfts.Length;
             newAudio.RemoveRange(0, newFftCount * settings.StepSize);
@@ -148,33 +150,27 @@ namespace Spectrogram
         }
 
 
-        public List<double[]> GetMelFFTs(int melBinCount)
+        public List<Complex[]> GetMelFFTs(int melBinCount)
         {
             if (settings.FreqMin != 0)
                 throw new InvalidOperationException("cannot get Mel spectrogram unless minimum frequency is 0Hz");
 
-            var fftsMel = new List<double[]>();
+            
+            var fftsMel = new List<Complex[]>();
+
+            /**
             foreach(var fft in ffts)
                 fftsMel.Add(FftSharp.Transform.MelScale(fft, SampleRate, melBinCount));
+            **/
+            throw new NotImplementedException("Only using Complex[] ffts and not double[] ffts which currently isn't supported");
 
-            return fftsMel;
+            //return fftsMel;
         }
 
-        
-        /* Currently deprecated in WPF projects
-        public Bitmap GetBitmap(double intensity = 1, bool dB = false, bool roll = false)
-        {
-            return Image.GetBitmap(ffts, cmap, intensity, dB, roll, NextColumnIndex);
-        }*/
-
+   
         public BitmapSource GetBitmapSource(double intensity = 1, bool dB = false, bool roll = false, double whiteNoiseMin=0) =>
             Image.GetBitmapSource(ffts, cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex, whiteNoiseMin);
 
-
-        /* Currently deprecated in WPF projects
-        public Bitmap GetBitmapMel(int melBinCount = 25, double intensity = 1, bool dB = false, bool roll = false) =>
-            Image.GetBitmap(GetMelFFTs(melBinCount), cmap, intensity, dB, roll, NextColumnIndex);
-        */
 
         public BitmapSource GetBitmapSourceMel(int melBinCount = 25, double intensity = 1, bool dB = false, bool roll = false) =>
             Image.GetBitmapSource(GetMelFFTs(melBinCount), cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex);
@@ -214,24 +210,24 @@ namespace Spectrogram
 
         public BitmapSource GetBitmapMax(double intensity = 1, bool dB = false, bool roll = false, int reduction = 4)
         {
-            List<double[]> ffts2 = new List<double[]>();
+            List<Complex[]> ffts2 = new List<Complex[]>();
             for (int i = 0; i < ffts.Count; i++)
             {
-                double[] d1 = ffts[i];
-                double[] d2 = new double[d1.Length / reduction];
+                Complex[] d1 = ffts[i];
+                Complex[] d2 = new Complex[d1.Length / reduction];
                 for (int j = 0; j < d2.Length; j++)
                     for (int k = 0; k < reduction; k++)
-                        d2[j] = Math.Max(d2[j], d1[j * reduction + k]);
+                        d2[j] = d2[j].Magnitude > d1[j * reduction + k].Magnitude ? d2[j] : d1[j * reduction + k];
                 ffts2.Add(d2);
             }
+
             return Image.GetBitmapSource(ffts2, cmap, settings.SampleRate, intensity, dB, roll, NextColumnIndex);
         }
 
+        
         public void SaveData(string filePath, int melBinCount = 0)
         {
-            if (!filePath.EndsWith(".sff", StringComparison.OrdinalIgnoreCase))
-                filePath += ".sff";
-            new SFF(this, melBinCount).Save(filePath);
+            throw new NotImplementedException("If using, will implement a method to store Complex data and not just SFF");
         }
 
         private int fixedWidth = 0;
@@ -252,8 +248,8 @@ namespace Spectrogram
                 }
 
                 while (ffts.Count < fixedWidth) {
-                    ffts.Insert(0, new double[Height]);
-                    ffts_complex.Insert(0, new FftSharp.Complex[Height]);
+                    ffts.Insert(0, new Complex[settings.FftSize]);
+                    ffts_complex.Insert(0, new FftSharp.Complex[settings.FftSize]);
                 }
             }
         }
@@ -274,17 +270,25 @@ namespace Spectrogram
             return pixelRow - 1;
         }
 
-        public List<double[]> GetFFTs()
+        public List<Complex[]> GetFFTs()
         {
             return ffts;
         }
 
-        public List<FftSharp.Complex[]> GetComplexFFTS()
+        public List<Complex[]> CopyFFTs()
         {
-            return ffts_complex;
+            List<Complex[]> copy = new List<Complex[]>();
+            foreach (Complex[] fft in ffts) 
+            {
+                Complex[] fft_copy = new Complex[fft.Length];
+                for (int i = 0; i < fft.Length; i++)
+                    fft_copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+                copy.Add(fft_copy);
+            }
+            return copy;
         }
 
-
+        
         public (double freqHz, double magRms) GetPeak(bool latestFft = true)
         {
             if (ffts.Count == 0)
@@ -293,15 +297,15 @@ namespace Spectrogram
             if (latestFft == false)
                 throw new NotImplementedException("peak of mean of all FFTs not yet supported");
 
-            double[] freqs = ffts[ffts.Count - 1];
+            Complex[] freqs = ffts[ffts.Count - 1];
 
             int peakIndex = 0;
             double peakMagnitude = 0;
             for (int i = 0; i < freqs.Length; i++)
             {
-                if (freqs[i] > peakMagnitude)
+                if (freqs[i].Magnitude > peakMagnitude)
                 {
-                    peakMagnitude = freqs[i];
+                    peakMagnitude = freqs[i].Magnitude;
                     peakIndex = i;
                 }
             }

@@ -70,34 +70,29 @@ namespace AudioAnalysis
              * 1. Modulate each Complex[] fft array with the window 
              * 2. Summate each array into one final double array
              * 3. The length of the data array will the total number of elements in ffts divided by the stepsize, ffts.Count*FftSize/stepSize
-             * 
-             * 
-             * TODO: The playback quality isn't as good as it could be
-             * TODO: Implement testing to assert that the deviated quality is within standards
              */
 
             double[] data = new double[window.Length + ffts.Count * stepSize];
+            double gain = 5;
             for (int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
             {
                 Complex[] buffer = ffts[windowed_block];
                 Transform.IFFT(buffer); 
                 int data_index = windowed_block * stepSize;
                 for (int j = 0; j < buffer.Length; j++)
-                    data[data_index + j] += buffer[j].Real * window[j] / window.Length;
+                    data[data_index + j] += buffer[j].Real * window[j] / window.Length * gain;
             }
 
             return data;
         }
 
-        public static List<Complex[]> STFT(double[] audio, int stepSize, double[] window)
+        public static List<Complex[]> STFT(double[] audio, int hopSize, double[] window)
         {
             /**
              * Short Time Fourier Transform 
-             * We do normalization (1/N) on the inverse transform instead of the forward transform. 
              */
 
-
-            int num_blocks = (audio.Length - window.Length) / stepSize;
+            int num_blocks = (audio.Length - window.Length) / hopSize;
 
             //window too large or stepSize too large to get a single windowed block out of it
             if (num_blocks < 1)
@@ -108,9 +103,9 @@ namespace AudioAnalysis
             Parallel.For(0, num_blocks, windowed_block =>
             {
                 FftSharp.Complex[] buffer = new FftSharp.Complex[window.Length];
-                int sourceIndex = windowed_block * stepSize;
+                int sourceIndex = windowed_block * hopSize;
                 for (int i = 0; i < window.Length; i++)
-                    buffer[i].Real = audio[sourceIndex + i] * window[i];
+                    buffer[i].Real = audio[sourceIndex + i] * window[i] / window.Length;
 
                 FftSharp.Transform.FFT(buffer);
                 ffts.Add(buffer);

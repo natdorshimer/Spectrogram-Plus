@@ -66,7 +66,6 @@ namespace SpecPlus
         private bool specPaused = false;
         private double zoomFactor = 1;
 
-
         public SpecPlusWindow()
         {
             InitializeComponent();
@@ -78,6 +77,7 @@ namespace SpecPlus
             double[] newAudio = listener.GetNewAudio();
             if (!specPaused)
                 spec.Add(newAudio, process: false);
+
             spec.Process();
             DisplaySpectrogram();
 
@@ -105,7 +105,7 @@ namespace SpecPlus
          * Sets up a listener for the selected microphone and initializes a spectrogram display
          */
         public void StartListening()
-    {
+        {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
             int stepSize = fftSize - (int) (fftSize * overlap); //This can change the quality of the ISTFT signal. Keep an eye on this
@@ -178,7 +178,7 @@ namespace SpecPlus
             for (int i = 0; i <= 5; i++)
             {
                 string end = $"{i}.wav";
-                if(i > 0) Filter.LinearFrequencyShifter(stft, 100);
+                if (i > 0) Filter.LinearFrequencyShifter(stft, 100);
                 stft.SaveToWav(filename+end);
             }
         }
@@ -198,10 +198,9 @@ namespace SpecPlus
             {
                 
                 string filename = saveFile.FileName;
-                FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-                //Filter.LinearFrequencyShifter(stft, 500);
-                //stft.SaveToWav(filename);
+                FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
                 LinearFrequencyShifterMulti(stft);
+                //stft.SaveToWav(filename);
             }
         }
 
@@ -223,7 +222,7 @@ namespace SpecPlus
             }
 
             //Make a snippet from those indices  for easy transforming / saving
-            FFTs stft = new FFTs(spec.GetComplexFFTS(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+            FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
             List<Complex[]> ffts = stft.DeepCopyFFTs();
             List<Complex[]> snippet = new List<Complex[]>();
             FFTs stft_snippet = new FFTs(snippet, stft.sampleRate, stft.stepSize, stft.window);
@@ -283,7 +282,6 @@ namespace SpecPlus
         private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             scrollViewerSpec.ScrollToRightEnd();
-            scrollViewerSpec.ScrollToBottom();
         }
 
         private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
@@ -361,6 +359,7 @@ namespace SpecPlus
         private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             zoomFactor += (double)e.Delta / (1000);
+            scrollViewerSpec.ScrollToBottom();
         }
     }
 }

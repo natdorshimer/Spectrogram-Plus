@@ -16,17 +16,17 @@ namespace Spectrogram
     public static class Image
     {
         //For use in WPF
-        public static BitmapSource GetBitmapSource(IList<double[]> ffts, Colormap cmap, int sampleRate, double intensity = 1, bool dB = false, bool roll = false, int rollOffset = 0, double whiteNoiseMin = 0)
+        public static BitmapSource GetBitmapSource(IList<FftSharp.Complex[]> ffts, Colormap cmap, int sampleRate, double intensity = 1, bool dB = false, bool roll = false, int rollOffset = 0, double whiteNoiseMin = 0)
         {
             int resolution = sampleRate / ffts[0].Length;
-            int maxFreq = 10000;
+            int maxFreq = 1000000;
             int maxBin = maxFreq / resolution;
             if (ffts.Count == 0)
                 throw new ArgumentException("This Spectrogram contains no FFTs (likely because no signal was added)");
 
 
             int Width = ffts.Count;
-            int Height = Math.Min(ffts[0].Length, maxBin);
+            int Height = ffts[0].Length; //No point in showing beyond nyquist frequency
 
             var pixelFormat = System.Windows.Media.PixelFormats.Indexed8;
             WriteableBitmap bit = new WriteableBitmap(Width, Height, 96, 96, pixelFormat, cmap.GetBitmapPalette());
@@ -51,7 +51,7 @@ namespace Spectrogram
 
                     for (int row = 0; row < Height; row++)
                     {
-                        double value = ffts[sourceCol][row];
+                        double value = ffts[sourceCol][row].Magnitude;
                         if (value <= whiteNoiseMin)
                             value = 0;
                         if (dB)

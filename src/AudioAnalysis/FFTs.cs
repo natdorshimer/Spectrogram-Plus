@@ -24,6 +24,12 @@ namespace AudioAnalysis
         public int sampleRate { get; private set; }
         public int stepSize { get; private set; }
 
+        public int FreqNyquist => sampleRate / 2;
+
+        public int nyquistBin => fftSize / 2;
+
+        public int fftSize => window.Length;
+
         public int FreqResolution => sampleRate / window.Length;
 
         private const int default_Fftsize = 1024;
@@ -96,5 +102,27 @@ namespace AudioAnalysis
             using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(sampleRate, 1));
             writer.WriteSamples(audio, 0, audio.Length);
         }
+
+        /**
+         * The purpose of Mirror is to reproduce the first half of the FFT into the second half since it's a real valued signal
+         * Ideally would allow me to only modify the single side band, mirror it, and then perfrom an ISTFT instead of having
+         * to modify both halves of the STFT before doing ISTFT. 
+         * 
+         * TODO: The Mirror'ed quality isn't kind of roboty
+         */
+        private void Mirror()
+        {
+            foreach (Complex[] fft in ffts)
+            {
+                for (int i = 0; i <= nyquistBin; i++)
+                {
+                    Complex val = fft[i];
+                    fft[fft.Length - 1 - i].Real = val.Real;
+                    fft[fft.Length - 1 - i].Imaginary = val.Imaginary;
+                }
+                
+            }
+        }
+
     }
 }
