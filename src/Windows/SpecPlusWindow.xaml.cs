@@ -327,14 +327,5 @@ namespace SpecPlus
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
-        private void TextBoxOverlap_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                overlap = cbOverlap.SelectedIndex / (cbOverlap.SelectedIndex + 1);
-                StartListening();
-            }
-        }
-
     }
 }

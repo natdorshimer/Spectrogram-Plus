@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Spectrogram_Plus</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon></ApplicationIcon>
+    <ApplicationIcon>SpecPlusIcon.ico</ApplicationIcon>
     <PackageIcon>icon.PNG</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Windows\icon.PNG" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
@@ -23,6 +27,10 @@
 
   <ItemGroup>
     <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Windows\icon.PNG" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpecPlus"
         mc:Ignorable="d"
-        Title="Spectrogram Plus" Height="700" Width="800" FontSize="16" FontFamily="Segoe UI Light" Icon="/icon.PNG"
+        Title="Spectrogram Plus" Height="700" Width="800" FontSize="16" FontFamily="Segoe UI Light" Icon="/Windows/icon.PNG"
         KeyDown="Window_KeyDown"
         >
     <Grid x:Name="SpecPlusGrid">
