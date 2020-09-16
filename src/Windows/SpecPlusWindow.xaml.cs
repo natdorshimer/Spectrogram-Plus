@@ -169,7 +169,6 @@ namespace SpecPlus
                 string filename = saveFile.FileName;
                 FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
                 Filter.LFSMultiSave(stft);
-                //stft.SaveToWav(filename);
             }
         }
 

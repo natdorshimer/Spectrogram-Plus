@@ -257,9 +257,10 @@ namespace Spectrogram
         /**
          * TODO: This still needs to be converted to WPF
          */
-        public Bitmap GetVerticalScale(int width, int offsetHz = 0, int tickSize = 3, int reduction = 1)
+        public BitmapSource GetVerticalScale(int width, int offsetHz = 0, int tickSize = 3, int reduction = 1)
         {
-            return Scale.Vertical(width, settings, offsetHz, tickSize, reduction);
+            throw new NotImplementedException();
+            //return Scale.Vertical(width, settings, offsetHz, tickSize, reduction);
         }
 
         public int PixelY(double frequency, int reduction = 1)
