@@ -20,9 +20,8 @@ namespace Spectrogram_Plus.Design
         public Point startPoint { get; private set; }
         public Point endPoint { get; private set; }
         public bool shouldDraw { get; private set; } //Determines if the selectedWindowToDraw should continue updating its position 
-
         public Rectangle windowToDraw { get; private set; } //This is the rectangle that shows the area of the spectrogram selected
-        
+
 
         public SelectedSpecWindow()
         {
@@ -33,6 +32,11 @@ namespace Spectrogram_Plus.Design
                 Stroke = Brushes.White,
                 StrokeThickness = 1.0
             };
+        }
+
+        public bool WindowExists()
+        {
+            return startPoint != endPoint;
         }
 
         public SelectedSpecWindow(Point startPoint)

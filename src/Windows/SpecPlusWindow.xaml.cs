@@ -30,8 +30,7 @@ using NAudio.Wave;
 using Spectrogram_Plus;
 using System.Windows.Controls.Primitives;
 using Spectrogram_Plus.Design;
-
-
+using Spectrogram_Plus.Windows;
 
 namespace SpecPlus
 {
@@ -42,10 +41,14 @@ namespace SpecPlus
     public partial class SpecPlusWindow : System.Windows.Window
     {
         private Spectrogram.Spectrogram spec; //Spectrogram
+
+
+        private FFTs stft;
         private Colormap[] cmaps;             //Colormaps for spectrogram display
         private DispatcherTimer specTimer;    //Spectrogram/Program clock
         private Listener listener;            //Microphone listener
         private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
+        private SelectedWindowIndices selectedIndices = new SelectedWindowIndices();
 
         private int freq_resolution => spec.SampleRate / spec.FftSize;
         private double time_resolution => 1d / (double)freq_resolution;
@@ -79,8 +82,10 @@ namespace SpecPlus
             //Display Settings
             double brightness = sliderBrightness.Value;
             double specGridWidth = this.ActualWidth - ControlsGrid.ActualWidth;
+            specGridWidth = specGridWidth < 0 ? 0 : specGridWidth;
             ScrollBar scrollBar = (ScrollBar)scrollViewerSpec.Template.FindName("PART_VerticalScrollBar", scrollViewerSpec);
             double scrollBarSpace = scrollBar.ActualWidth*2 + scrollViewerSpec.Margin.Left;
+            
             SpecGrid.MaxWidth = specGridWidth;
             spec.SetFixedWidth((int)((specGridWidth - scrollBarSpace)));
             
@@ -101,6 +106,7 @@ namespace SpecPlus
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
+            stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
         }
 
 
@@ -165,8 +171,10 @@ namespace SpecPlus
             if ((bool)saveFile.ShowDialog())
             {
                 string filename = saveFile.FileName;
-                FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-                Filter.LFSMultiSave(stft);
+
+                FFTs stft_copy = stft.Copy(); //To not apply the gain to the spectrogram
+                Filter.AddGain(stft_copy, sliderAudioGain.Value);
+                stft_copy.SaveToWav(filename);
             }
         }
 
@@ -182,6 +190,7 @@ namespace SpecPlus
         {
             PaintGrid.Children.Remove(selectedWindow.windowToDraw);
             selectedWindow = new SelectedSpecWindow();
+            selectedIndices = new SelectedWindowIndices();
         }
 
         private (int t_index, int f_index) PositionToIndices(Point p)
@@ -195,16 +204,16 @@ namespace SpecPlus
             return (t_index, f_index);
         }
 
-        private void SaveSnippet()
+        private void QuickSaveSnippet()
         {
-            //Get the indices of the STFT
-            int fftStartIndex = PositionToIndices(selectedWindow.startPoint).t_index;
-            int fftEndIndex = PositionToIndices(selectedWindow.endPoint).t_index;
-            if (fftStartIndex > fftEndIndex)
-                (fftStartIndex, fftEndIndex) = (fftEndIndex, fftStartIndex);
-
-            FFTs stft = new FFTs(spec.CopyFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-            stft.SaveSnippet("C:\\Users\\Natalie\\Documents\\wavs\\snips\\test.wav", fftStartIndex, fftEndIndex); //todo: Testing only
+            string filename = "C:\\Users\\Natalie\\Documents\\wavs\\snips\\QuickSave.wav";
+            FFTs stft_copy = stft.Copy();
+            Filter.AddGain(stft_copy, sliderAudioGain.Value);
+            if (selectedIndices.Exists())
+                stft_copy.SaveSnippet(filename, selectedIndices.Indices().timeIndex1, selectedIndices.Indices().timeIndex2);
+            else
+                stft_copy.SaveToWav(filename);
+            
         }
 
         private void OpenPlotAt(Point p)
@@ -229,7 +238,22 @@ namespace SpecPlus
                 PauseButtonText.Text = "Pause";
         }
 
+        private void Pause()
+        {
+            if (!specPaused)
+                TogglePause();
+        }
 
+        private void Unpause()
+        {
+            if (specPaused)
+                TogglePause();
+        }
+
+        public FFTs GetFFTs()
+        {
+            return stft;
+        }
         /**
          * Event Handlers
          */
@@ -260,16 +284,11 @@ namespace SpecPlus
                     if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
                         SaveSpectrogram();
                     else
-                        SaveSnippet();
+                        QuickSaveSnippet();
                     break;
             }
         }
 
-        private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-                Double.TryParse(TextBoxWhiteNoise.Text, out whiteNoiseMin);
-        }
 
         private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
         {
@@ -302,11 +321,8 @@ namespace SpecPlus
         private void PaintGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             selectedWindow.FinishDrawing();
-
-            /**
-             * TODO: Implement the features upon selecting the window
-             *   * Implement basic filters to apply to the spectrogram / save the spectrogram
-             */
+            (int t1, int t2, int f1, int f2) = WindowPoints();
+            selectedIndices = new SelectedWindowIndices(t1, t2, f1, f2);
         }
 
         private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -327,5 +343,55 @@ namespace SpecPlus
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
+        private void ButtonNonLinFrequencyShifter_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void ButtonWhiteNoiseFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var whiteNoiseWindow= new WhiteNoiseFilterWindow(this);
+            whiteNoiseWindow.Activate();
+            whiteNoiseWindow.Show();
+            whiteNoiseWindow.Topmost = true;
+
+            //TODO
+        }
+
+        public void WhiteNoiseFilterAll(double threshold)
+        {
+            Filter.WhiteNoiseFilter(stft, threshold);
+        }
+
+        private (int lowerTimeIndex, int higherTimeIndex, int lowerFreqIndex, int higherFreqIndex) WindowPoints()
+        {
+            Point startPoint = selectedWindow.startPoint;
+            Point endPoint = selectedWindow.endPoint;
+            (int timeIndex1, int freqIndex1) = PositionToIndices(startPoint);
+            (int timeIndex2, int freqIndex2) = PositionToIndices(endPoint);
+            if (freqIndex2 < freqIndex1)
+                (freqIndex1, freqIndex2) = (freqIndex2, freqIndex1);
+            if (timeIndex2 < timeIndex1)
+                (timeIndex1, timeIndex2) = (timeIndex2, timeIndex1);
+
+            return (timeIndex1, timeIndex2, freqIndex1, freqIndex2);
+
+        }
+        public void WhiteNoiseFilterSelectedWindow(double threshold)
+        {
+            if (!selectedWindow.WindowExists())
+            {
+                MessageBox.Show("There is no window selected!");
+                return;
+            }
+
+            Filter.WhiteNoiseFilter(stft, threshold, selectedIndices);
+
+        }
     }
 }

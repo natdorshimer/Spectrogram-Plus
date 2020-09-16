@@ -56,7 +56,6 @@ namespace Spectrogram
                 SetFixedWidth(fixedWidth.Value);
         }
 
-
         public override string ToString()
         {
             double processedSamples = ffts.Count * settings.StepSize + settings.FftSize;

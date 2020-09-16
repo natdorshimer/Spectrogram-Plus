@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using FftSharp;
 using NAudio.Wave;
 namespace AudioAnalysis
@@ -100,6 +101,41 @@ namespace AudioAnalysis
             using WaveFileWriter writer = new NAudio.Wave.WaveFileWriter(filename, new WaveFormat(sampleRate, 1));
             writer.WriteSamples(audio, 0, audio.Length);
         }
+
+        public FFTs Copy()
+        {
+            /**
+             * Produces a deep copy
+             */
+            return new FFTs(CopyFFTs(), sampleRate, stepSize, window);
+        }
+
+        public FFTs TimeSlice(int timeIndex1, int timeIndex2)
+        {
+            List<Complex[]> slice = new List<Complex[]>();
+            for (int n = timeIndex1; n < timeIndex2; n++)
+                slice.Add(ffts[n]);
+            return new FFTs(slice, sampleRate, stepSize, window);
+        }
+        /**
+        public FFTs Index(int timeIndex1, int timeIndex2, int freqIndex1, int freqIndex2)
+        {
+            /**
+             * Returns a smaller snapshot of the FFTs contained within those indices
+             
+            List<Complex[]> slice = new List<Complex[]>();
+            for(int t = timeIndex1; t < timeIndex2; t++)
+            {
+                Complex[] time_slice = new Complex[freqIndex2 - freqIndex1];
+                for (int f = freqIndex1; f < freqIndex2; f++)
+                    time_slice[f - freqIndex1] = ffts[t][f];
+                slice.Add(time_slice);
+            }
+
+            return new FFTs(slice, sampleRate, stepSize, window);
+        }*/
+
+        public int Count => ffts.Count;
 
         public void SaveSnippet(string filename, int startIndex, int endIndex)
         {
