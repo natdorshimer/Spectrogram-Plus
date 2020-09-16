@@ -30,11 +30,9 @@ using NAudio.Wave;
 using Spectrogram_Plus;
 using System.Windows.Controls.Primitives;
 using Spectrogram_Plus.Design;
-/**
-* Next Tasks:
-* 1. Implement saving feature to save the select window (or the spectrogram itself)
-* 2. Implement some basic audio filters
-*/
+
+
+
 namespace SpecPlus
 {
 

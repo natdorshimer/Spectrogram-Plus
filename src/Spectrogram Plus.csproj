@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Spectrogram_Plus</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>SpecPlusIcon.ico</ApplicationIcon>
+    <ApplicationIcon></ApplicationIcon>
     <PackageIcon>icon.PNG</PackageIcon>
   </PropertyGroup>
 
@@ -22,14 +22,28 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="icon.PNG">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </Resource>
+    <Page Include="App.xaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Include="App.xaml" />
+    <ApplicationDefinition Update="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>
