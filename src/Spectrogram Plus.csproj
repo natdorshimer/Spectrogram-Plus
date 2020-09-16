@@ -17,6 +17,7 @@
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
     <PackageReference Include="FftSharp" Version="1.0.7" />
     <PackageReference Include="NAudio" Version="1.10.0" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.0.39" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
   </ItemGroup>
 
@@ -28,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Design\" />
+    <Page Include="App.xaml" />
   </ItemGroup>
 
 </Project>

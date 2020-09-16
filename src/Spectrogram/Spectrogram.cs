@@ -177,7 +177,7 @@ namespace Spectrogram
 
 
         /**
-         * TODO: Requires testing
+         * sTODO: Requires testing
          */
         public void SaveImage(string fileName, double intensity = 1, bool dB = false, bool roll = false)
         {

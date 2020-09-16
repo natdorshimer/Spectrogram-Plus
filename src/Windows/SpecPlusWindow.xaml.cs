@@ -27,11 +27,14 @@ using AudioAnalysis;
 using Microsoft.Win32;
 using FftSharp;
 using NAudio.Wave;
+using Spectrogram_Plus;
+using System.Windows.Controls.Primitives;
+using Spectrogram_Plus.Design;
 /**
- * Next Tasks:
- * 1. Implement saving feature to save the select window (or the spectrogram itself)
- * 2. Implement some basic audio filters
- */
+* Next Tasks:
+* 1. Implement saving feature to save the select window (or the spectrogram itself)
+* 2. Implement some basic audio filters
+*/
 namespace SpecPlus
 {
 
@@ -44,20 +47,10 @@ namespace SpecPlus
         private Colormap[] cmaps;             //Colormaps for spectrogram display
         private DispatcherTimer specTimer;    //Spectrogram/Program clock
         private Listener listener;            //Microphone listener
-
-
-        //Selected Window Data
-        private Point selectedWindowStartPoint;
-        private Point selectedWindowEndPoint;
-        private bool selectedWindowShouldDraw = false; //Determines if the selectedWindowToDraw should continue updating its position 
-        private Rectangle selectedWindowToDraw = new Rectangle(); //This is the rectangle that shows the area of the spectrogram selected
+        private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
 
         private int freq_resolution => spec.SampleRate / spec.FftSize;
         private double time_resolution => 1d / (double)freq_resolution;
-
-        private double time_scale => time_resolution / zoomFactor;
-
-        private double freq_scale => freq_resolution / zoomFactor;
 
         //Spectrogram Settings
         private double whiteNoiseMin = 0;     //Basic filter for White Noise
@@ -72,6 +65,7 @@ namespace SpecPlus
             SpecInit();
         }
 
+        //What the program does every clock cycle
         private void SpecTimer_tick(object sender, EventArgs e)
         {
             double[] newAudio = listener.GetNewAudio();
@@ -80,22 +74,18 @@ namespace SpecPlus
 
             spec.Process();
             DisplaySpectrogram();
-
-            if (selectedWindowShouldDraw)
-                UpdateSelectedSpecWindow();
         }
 
         private void DisplaySpectrogram()
         {
             //Display Settings
-            //TODO: Clean up GUI code
-            const int rightMargin = 20;
             double brightness = sliderBrightness.Value;
-            SpecGrid.MaxWidth = this.ActualWidth - ControlsGrid.ActualWidth - rightMargin;
-            SpecGrid.MaxHeight = this.ActualHeight;
-            scrollViewerSpec.MaxHeight = this.ActualHeight - 60;
-
-            spec.SetFixedWidth((int)((SpecGrid.MaxWidth - 55) / zoomFactor));
+            double specGridWidth = this.ActualWidth - ControlsGrid.ActualWidth;
+            ScrollBar scrollBar = (ScrollBar)scrollViewerSpec.Template.FindName("PART_VerticalScrollBar", scrollViewerSpec);
+            double scrollBarSpace = scrollBar.ActualWidth*2 + scrollViewerSpec.Margin.Left;
+            SpecGrid.MaxWidth = specGridWidth;
+            spec.SetFixedWidth((int)((specGridWidth - scrollBarSpace)));
+            
             BitmapSource source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
             TransformedBitmap trans = new TransformedBitmap(source, new ScaleTransform(zoomFactor, zoomFactor));
             imageSpec.Source = trans;
@@ -115,15 +105,6 @@ namespace SpecPlus
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
         }
 
-
-        private void TogglePause()
-        {
-            specPaused = !specPaused;
-            if (specPaused)
-                PauseButtonText.Text = "Run";
-            else
-                PauseButtonText.Text = "Pause";
-        }
 
         private void SpecInit()
         {
@@ -172,17 +153,6 @@ namespace SpecPlus
             specTimer.Start();
         }
 
-        private void LinearFrequencyShifterMulti(FFTs stft)
-        {
-            string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
-            for (int i = 0; i <= 5; i++)
-            {
-                string end = $"{i}.wav";
-                if (i > 0) Filter.LinearFrequencyShifter(stft, 100);
-                stft.SaveToWav(filename+end);
-            }
-        }
-
         private void SaveSpectrogram()
         {
             if (!specPaused)
@@ -196,74 +166,72 @@ namespace SpecPlus
 
             if ((bool)saveFile.ShowDialog())
             {
-                
                 string filename = saveFile.FileName;
                 FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-                LinearFrequencyShifterMulti(stft);
+                Filter.LFSMultiSave(stft);
                 //stft.SaveToWav(filename);
             }
         }
 
-        private void saveSnippet()
-        {
-
-            /**
-             * TODO: Bug: the saved snippet isn't entirely accurate. It does save, but the coordinates are sometimes wrong.
-             */
-
-            //Get the indices of the STFT
-            int fftStartIndex = (int)(selectedWindowStartPoint.X / zoomFactor);
-            int fftEndIndex = (int)(selectedWindowEndPoint.X / zoomFactor);
-            if (fftStartIndex > fftEndIndex)
-            {
-                int temp = fftEndIndex;
-                fftEndIndex = fftStartIndex;
-                fftStartIndex = temp;
-            }
-
-            //Make a snippet from those indices  for easy transforming / saving
-            FFTs stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
-            List<Complex[]> ffts = stft.DeepCopyFFTs();
-            List<Complex[]> snippet = new List<Complex[]>();
-            FFTs stft_snippet = new FFTs(snippet, stft.sampleRate, stft.stepSize, stft.window);
-            for (int i = fftStartIndex; i <= fftEndIndex; i++)
-                snippet.Add(ffts[i]);
-            stft_snippet.SaveToWav("C:\\Users\\Natalie\\Documents\\wavs\\snips\\test.wav");
-        }
 
         private void InitSelectedSpecWindow(Point startPoint)
         {
-            //Specify that it should starting drawing the rectangle and initialize a new rectangle onto the painting grid
-            selectedWindowShouldDraw = true;
-            PaintGrid.Children.Remove(selectedWindowToDraw);
-
-            //Selection window settings for spectrogram
-            //Mouse is needed in case mouseleftbutton up happens on the rectangle instead of imagespec
-            selectedWindowToDraw = new Rectangle
-            {
-                Stroke = Brushes.White,
-                StrokeThickness = 1.0
-            };
-
-            PaintGrid.Children.Add(selectedWindowToDraw);
-
-            selectedWindowStartPoint = startPoint;
-            selectedWindowEndPoint = startPoint;
-            UpdateSelectedSpecWindow();
+            PaintGrid.Children.Remove(selectedWindow.windowToDraw);
+            selectedWindow = new SelectedSpecWindow(startPoint);
+            PaintGrid.Children.Add(selectedWindow.windowToDraw);
         }
 
-        private void UpdateSelectedSpecWindow()
+        private void RemoveSelectedSpecWindow()
         {
-            Rect rectWindow = new Rect(selectedWindowStartPoint, selectedWindowEndPoint);
-            selectedWindowToDraw.Arrange(rectWindow);
+            PaintGrid.Children.Remove(selectedWindow.windowToDraw);
+            selectedWindow = new SelectedSpecWindow();
         }
 
-        private void RemoveSelectedWindow()
+        private (int t_index, int f_index) PositionToIndices(Point p)
         {
-            PaintGrid.Children.Remove(selectedWindowToDraw);
-            selectedWindowToDraw = new Rectangle();
-            selectedWindowShouldDraw = false;
+            int f_index = (int)((imageSpec.ActualHeight - p.Y) / zoomFactor);
+
+            int maxPossibleFFTs = (int)(imageSpec.ActualWidth / zoomFactor);
+            int t_index = (int)((p.X - (maxPossibleFFTs - spec.GetFFTs().Count)) / zoomFactor);
+            t_index = t_index < 0 ? 0 : t_index; //If there's not enough data and the point is out of bounds, just start it at 0
+
+            return (t_index, f_index);
         }
+
+        private void SaveSnippet()
+        {
+            //Get the indices of the STFT
+            int fftStartIndex = PositionToIndices(selectedWindow.startPoint).t_index;
+            int fftEndIndex = PositionToIndices(selectedWindow.endPoint).t_index;
+            if (fftStartIndex > fftEndIndex)
+                (fftStartIndex, fftEndIndex) = (fftEndIndex, fftStartIndex);
+
+            FFTs stft = new FFTs(spec.CopyFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
+            stft.SaveSnippet("C:\\Users\\Natalie\\Documents\\wavs\\snips\\test.wav", fftStartIndex, fftEndIndex); //todo: Testing only
+        }
+
+        private void OpenPlotAt(Point p)
+        {
+            //Opens a window that plots information of the FFT at the point where the user double clicked
+
+            int fft_index = PositionToIndices(p).t_index;
+            Complex[] fft = spec.GetFFTs()[fft_index];
+            FFTPlot plotwin = new FFTPlot();
+            plotwin.PlotFFT(fft, spec.SampleRate);
+            plotwin.Activate();
+            plotwin.Show();
+            plotwin.Topmost = true;
+        }
+
+        private void TogglePause()
+        {
+            specPaused = !specPaused;
+            if (specPaused)
+                PauseButtonText.Text = "Run";
+            else
+                PauseButtonText.Text = "Pause";
+        }
+
 
         /**
          * Event Handlers
@@ -279,9 +247,25 @@ namespace SpecPlus
 
         private void cbCmaps_SelectionChanged(object sender, SelectionChangedEventArgs e) => spec.SetColormap(cmaps[cbCmaps.SelectedIndex]);
 
-        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void scrollViewerSpec_ScrollChanged(object sender, ScrollChangedEventArgs e) { }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            scrollViewerSpec.ScrollToRightEnd();
+            switch (e.Key)
+            {
+                case Key.Space:
+                    TogglePause();
+                    break;
+                case Key.Delete:
+                    RemoveSelectedSpecWindow();
+                    break;
+                case (Key.S):
+                    if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
+                        SaveSpectrogram();
+                    else
+                        SaveSnippet();
+                    break;
+            }
         }
 
         private void TextBoxWhiteNoise_KeyDown(object sender, KeyEventArgs e)
@@ -293,11 +277,15 @@ namespace SpecPlus
         private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
         {
             Point p = e.GetPosition(imageSpec);
-            selectedWindowEndPoint = p;
-            int freq_resolution = spec.SampleRate / spec.FftSize;
-            int freq = (int)(freq_resolution * (imageSpec.ActualHeight-p.Y) / zoomFactor);   //hz
-            double time_resolution = 1d / ((double)freq_resolution);
-            double time = ((imageSpec.ActualWidth - p.X) * time_resolution / zoomFactor * 1000); //ms
+
+            //Make sure the selected window is being updated properly
+            selectedWindow.UpdateShape(p);
+
+            //Update mouse position info for frequency and time location
+            (int t_index, int f_index) = PositionToIndices(p);
+
+            double time = (t_index * time_resolution * 1000); //ms
+            int freq = (int)(freq_resolution * f_index);   //hz
 
             if(time > 1000)
                 MousePosition.Text =  $"{freq} Hz,  {Math.Round(time/1000, 2)} s";
@@ -305,12 +293,18 @@ namespace SpecPlus
                 MousePosition.Text = $"{freq} Hz,  {(int)time} ms";
         }
 
-        private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) 
-            => InitSelectedSpecWindow(e.GetPosition(imageSpec));
-        
+
+        private void PaintGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+                OpenPlotAt(e.GetPosition(imageSpec));
+            else
+                InitSelectedSpecWindow(e.GetPosition(imageSpec));
+        }
+
         private void PaintGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            selectedWindowShouldDraw = false;
+            selectedWindow.FinishDrawing();
 
             /**
              * TODO: Implement the features upon selecting the window
@@ -325,27 +319,16 @@ namespace SpecPlus
             //TODO: Modify behavior for filters once implemented, open a dialog box with filtering options
         }
 
+        private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            zoomFactor += (double)e.Delta / (1000);
+            if (zoomFactor < 1)
+                zoomFactor = 1;
+            scrollViewerSpec.ScrollToRightEnd();
+            scrollViewerSpec.ScrollToBottom();
+        }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Space:
-                    TogglePause();
-                    break;
-                case Key.Delete:
-                    RemoveSelectedWindow();
-                    break;
-                case (Key.S):
-                    if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
-                        SaveSpectrogram();
-                    else
-                        saveSnippet();
-                    break;
-            }
-        }
 
         private void TextBoxOverlap_KeyDown(object sender, KeyEventArgs e)
         {
@@ -356,10 +339,5 @@ namespace SpecPlus
             }
         }
 
-        private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            zoomFactor += (double)e.Delta / (1000);
-            scrollViewerSpec.ScrollToBottom();
-        }
     }
 }

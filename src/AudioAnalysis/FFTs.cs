@@ -15,8 +15,6 @@ namespace AudioAnalysis
          * This allows us to obtain a fourier transform as a function of frequency AND time, S(w, t) instead of being solely dependent on frequency. 
          *      This representation of audio is most akin to how our ears actually interperet audio. They work by sampling the FFT of the sound it hears, which is a function of time
          *      This also allows us to easily perform signal processing on small windows of time.
-
-         * TODO: Consider making a save method in this class instead of it being external.
          */
 
         private List<Complex[]> ffts;
@@ -68,7 +66,7 @@ namespace AudioAnalysis
 
         public double[] GetAudioDouble()
         {
-            List<Complex[]> ffts_copy = DeepCopyFFTs();
+            List<Complex[]> ffts_copy = CopyFFTs();
             return Fourier.ISTFT(ffts_copy, stepSize, window);
         }
 
@@ -83,7 +81,7 @@ namespace AudioAnalysis
 
 
         //TODO: Consider a better / more "standard" cloning solution
-        public List<Complex[]> DeepCopyFFTs()
+        public List<Complex[]> CopyFFTs()
         {
             List<Complex[]> newList = new List<Complex[]>();
             foreach (Complex[] fft in ffts)
@@ -103,24 +101,32 @@ namespace AudioAnalysis
             writer.WriteSamples(audio, 0, audio.Length);
         }
 
+        public void SaveSnippet(string filename, int startIndex, int endIndex)
+        {
+            List<Complex[]> copy = CopyFFTs();
+            List<Complex[]> snippet = new List<Complex[]>();
+            for (int i = startIndex; i <= endIndex; i++)
+                snippet.Add(copy[i]);
+            FFTs stft_snippet = new FFTs(snippet, sampleRate, stepSize, window);
+            stft_snippet.SaveToWav(filename);
+        }
         /**
          * The purpose of Mirror is to reproduce the first half of the FFT into the second half since it's a real valued signal
          * Ideally would allow me to only modify the single side band, mirror it, and then perfrom an ISTFT instead of having
          * to modify both halves of the STFT before doing ISTFT. 
          * 
-         * TODO: The Mirror'ed quality isn't kind of roboty
+         * TODO: The Mirror'ed quality is kind of roboty
          */
         private void Mirror()
         {
             foreach (Complex[] fft in ffts)
             {
-                for (int i = 0; i <= nyquistBin; i++)
+                for (int i = 0; i < nyquistBin; i++)
                 {
                     Complex val = fft[i];
                     fft[fft.Length - 1 - i].Real = val.Real;
-                    fft[fft.Length - 1 - i].Imaginary = val.Imaginary;
+                    fft[fft.Length - 1 - i].Imaginary = -val.Imaginary;
                 }
-                
             }
         }
 

@@ -70,6 +70,17 @@ namespace AudioAnalysis
             }
         }
 
+        public static void LFSMultiSave(FFTs stft)
+        {
+            string filename = "C:\\Users\\Natalie\\Documents\\wavs\\multi\\";
+            for (int i = 0; i <= 5; i++)
+            {
+                string end = $"{i}.wav";
+                if (i > 0) Filter.LinearFrequencyShifter(stft, 100);
+                stft.SaveToWav(filename + end);
+            }
+        }
+
 
         public static void LinearFrequencyShifter(FFTs data, int freq_shift)
         {

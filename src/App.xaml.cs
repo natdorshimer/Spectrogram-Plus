@@ -13,5 +13,6 @@ namespace SpecPlus
     /// </summary>
     public partial class App : Application
     {
+
     }
 }

@@ -73,7 +73,7 @@ namespace AudioAnalysis
              */
 
             double[] data = new double[window.Length + ffts.Count * stepSize];
-            double gain = 5;
+            double gain = 10;
             for (int windowed_block = 0; windowed_block < ffts.Count; windowed_block++)
             {
                 Complex[] buffer = ffts[windowed_block];
