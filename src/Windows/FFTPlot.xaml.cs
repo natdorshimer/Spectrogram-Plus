@@ -23,7 +23,7 @@ namespace Spectrogram_Plus
             InitializeComponent();
         }
 
-        public void PlotFFT(Complex[] fft, int sampleRate = 0, bool ssb = false)
+        public void PlotFFT(Complex[] fft, int sampleRate = 0, bool ssb = true)
         {
             int length = (ssb == false ? fft.Length : fft.Length / 2);
 
