@@ -12,9 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using AudioAnalysis;
-using Spectrogram_Plus.Design;
+using SpecPlus.Design;
 
-namespace Spectrogram_Plus.Windows
+namespace SpecPlus.Windows
 {
     /// <summary>
     /// Interaction logic for WhiteNoiseFilterWindow.xaml
@@ -47,10 +47,10 @@ namespace Spectrogram_Plus.Windows
                     MessageBox.Show("There is no window selected!");
                     return;
                 }
-                Filter.WhiteNoiseFilter(stft, threshold, indices);
+                Filters.WhiteNoiseFilter(stft, threshold, indices);
             }
             else
-                Filter.WhiteNoiseFilter(stft, threshold);
+                Filters.WhiteNoiseFilter(stft, threshold);
         }
 
         private void ButtonApplyToWhole_Click(object sender, RoutedEventArgs e) =>

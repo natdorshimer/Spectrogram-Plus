@@ -4,7 +4,7 @@ using System.Text;
 using System.Windows;
 using SpecPlus;
 
-namespace Spectrogram_Plus.Windows
+namespace SpecPlus.Windows
 {
     public class ProcessingSelectionWindow : Window
     {

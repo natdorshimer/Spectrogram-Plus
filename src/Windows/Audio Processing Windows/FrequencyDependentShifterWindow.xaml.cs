@@ -11,15 +11,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using SpecPlus;
 
-namespace Spectrogram_Plus.Windows
+namespace SpecPlus.Windows
 {
     /// <summary>
-    /// Interaction logic for NonlinearFrequencyShifterWindow.xaml
+    /// Interaction logic for FrequencyDependentShifterWindow.xaml
     /// </summary>
-    public partial class NonlinearFrequencyShifterWindow : Window
+    public partial class FrequencyDependentShifterWindow : Window
     {
         SpecPlusWindow parentRef;
-        public NonlinearFrequencyShifterWindow(SpecPlusWindow parentRef)
+        public FrequencyDependentShifterWindow(SpecPlusWindow parentRef)
         {
             InitializeComponent();
             this.parentRef = parentRef;
@@ -27,7 +27,7 @@ namespace Spectrogram_Plus.Windows
 
         public static void OpenWindow(SpecPlusWindow parentRef)
         {
-            var processWindow = new NonlinearFrequencyShifterWindow(parentRef);
+            var processWindow = new FrequencyDependentShifterWindow(parentRef);
             processWindow.Activate();
             processWindow.Show();
             processWindow.Topmost = true;

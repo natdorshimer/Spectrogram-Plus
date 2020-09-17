@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Spectrogram_Plus.Design
+namespace SpecPlus.Design
 {
     public class SelectedWindowIndices
     {

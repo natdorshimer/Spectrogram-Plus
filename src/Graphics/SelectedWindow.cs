@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 
-namespace Spectrogram_Plus.Design
+namespace SpecPlus.Design
 {
     class SelectedSpecWindow
     {

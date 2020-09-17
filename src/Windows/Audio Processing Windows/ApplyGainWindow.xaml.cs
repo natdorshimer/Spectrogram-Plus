@@ -1,6 +1,6 @@
 ﻿using AudioAnalysis;
 using SpecPlus;
-using Spectrogram_Plus.Design;
+using SpecPlus.Design;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Spectrogram_Plus.Windows
+namespace SpecPlus.Windows
 {
     /// <summary>
     /// Interaction logic for ApplyGain.xaml
@@ -51,10 +51,10 @@ namespace Spectrogram_Plus.Windows
                     MessageBox.Show("There is no window selected!");
                     return;
                 }
-                Filter.AddGain(stft, dbGain, indices, dB: true);
+                Processing.AddGain(stft, dbGain, indices, dB: true);
             }
             else
-                Filter.AddGain(stft, dbGain, dB: true);
+                Processing.AddGain(stft, dbGain, dB: true);
         }
 
         private void ButtonApplyToWhole_Click(object sender, RoutedEventArgs e) =>

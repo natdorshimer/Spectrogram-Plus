@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using FftSharp;
 
-namespace Spectrogram_Plus
+namespace SpecPlus
 {
     /// <summary>
     /// Interaction logic for FFTPlot.xaml

@@ -27,10 +27,10 @@ using AudioAnalysis;
 using Microsoft.Win32;
 using FftSharp;
 using NAudio.Wave;
-using Spectrogram_Plus;
+using SpecPlus;
 using System.Windows.Controls.Primitives;
-using Spectrogram_Plus.Design;
-using Spectrogram_Plus.Windows;
+using SpecPlus.Design;
+using SpecPlus.Windows;
 
 namespace SpecPlus
 {
@@ -41,7 +41,6 @@ namespace SpecPlus
     public partial class SpecPlusWindow : System.Windows.Window
     {
         private Spectrogram.Spectrogram spec; //Spectrogram
-
 
         private FFTs stft;
         private Colormap[] cmaps;             //Colormaps for spectrogram display
@@ -60,14 +59,15 @@ namespace SpecPlus
         private bool specPaused = false;
         private double zoomFactor = 1;
 
+        public FFTs GetSTFT() => stft;
+        public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
+
         public SpecPlusWindow()
         {
             InitializeComponent();
             SpecInit();
         }
 
-        public FFTs GetSTFT() => stft;
-        public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
 
         //What the program does every clock cycle
         private void SpecTimer_tick(object sender, EventArgs e)
@@ -97,19 +97,18 @@ namespace SpecPlus
             imageSpec.Source = trans;
         }
 
-        /**
-         * Sets up a listener for the selected microphone and initializes a spectrogram display
-         */
+        
+        //Sets up a listener for the selected microphone and initializes a spectrogram display
         public void StartListening()
         {
             int sampleRate = Int32.Parse(sampleRates[cbSampleRate.SelectedIndex]);
             int fftSize = 1 << (9 + cbFFTsize.SelectedIndex);
-            int stepSize = fftSize - (int) (fftSize * overlap); //This can change the quality of the ISTFT signal. Keep an eye on this
+            int stepSize = fftSize - (int) (fftSize * overlap);
 
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
-            if(cmaps != null) spec.SetColormap(cmaps[cbCmaps.SelectedIndex]); //todo this is a hack for a race condition
+            if(cmaps != null) spec.SetColormap(cmaps[cbCmaps.SelectedIndex]); //todo this is a hack for this running before SpecInit
             stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
         }
 
@@ -163,8 +162,7 @@ namespace SpecPlus
 
         private void SaveSpectrogram()
         {
-            if (!specPaused)
-                TogglePause();
+            PauseSpectrogram();
 
             SaveFileDialog saveFile = new SaveFileDialog
             {
@@ -176,8 +174,16 @@ namespace SpecPlus
             {
                 string filename = saveFile.FileName;
 
-                FFTs stft_copy = stft.Copy(); //To not apply the gain to the spectrogram
-                Filter.AddGain(stft_copy, sliderAudioGain.Value);
+                FFTs stft_copy;
+                if (selectedIndices.Exists())
+                {
+                    (int t1, int t2, _, _) = selectedIndices.Indices();
+                    stft_copy = stft.Copy(t1, t2 - t1);
+                }
+                else
+                    stft_copy = stft.Copy(); //To not apply the gain to the spectrogram
+
+                Processing.AddGain(stft_copy, sliderAudioGain.Value);
                 stft_copy.SaveToWav(filename);
             }
         }
@@ -199,6 +205,8 @@ namespace SpecPlus
 
         private (int t_index, int f_index) PositionToIndices(Point p)
         {
+            //Maps a position p on the spectrogram to indices on the short time fourier transform
+             
             int f_index = (int)((imageSpec.ActualHeight - p.Y) / zoomFactor);
 
             int maxPossibleFFTs = (int)(imageSpec.ActualWidth / zoomFactor);
@@ -208,11 +216,12 @@ namespace SpecPlus
             return (t_index, f_index);
         }
 
+        //TODO: Only for testing / dev purposes. Remove on final build
         private void QuickSaveSnippet()
         {
             string filename = "C:\\Users\\Natalie\\Documents\\wavs\\snips\\QuickSave.wav";
             FFTs stft_copy = stft.Copy();
-            Filter.AddGain(stft_copy, sliderAudioGain.Value);
+            Processing.AddGain(stft_copy, sliderAudioGain.Value);
             if (selectedIndices.Exists())
                 stft_copy.SaveSnippet(filename, selectedIndices.Indices().timeIndex1, selectedIndices.Indices().timeIndex2);
             else
@@ -242,13 +251,13 @@ namespace SpecPlus
                 PauseButtonText.Text = "Pause";
         }
 
-        private void Pause()
+        private void PauseSpectrogram()
         {
             if (!specPaused)
                 TogglePause();
         }
 
-        private void Unpause()
+        private void UnpauseSpectrogram()
         {
             if (specPaused)
                 TogglePause();
@@ -258,6 +267,7 @@ namespace SpecPlus
         {
             return stft;
         }
+
         /**
          * Event Handlers
          */
@@ -333,7 +343,7 @@ namespace SpecPlus
         {
             TogglePause();
 
-            //TODO: Modify behavior for filters once implemented, open a dialog box with filtering options
+            //TODO: Modify behavior for freq dependent freq shifting possibly
         }
 
         private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -363,10 +373,8 @@ namespace SpecPlus
         }
 
 
-
-
         private void ButtonNonLinFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
-            NonlinearFrequencyShifterWindow.OpenWindow(this);
+            FrequencyDependentShifterWindow.OpenWindow(this);
 
         private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
             FrequencyShifterWindow.OpenWindow(this);

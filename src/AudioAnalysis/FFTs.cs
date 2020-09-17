@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using FftSharp;
 using NAudio.Wave;
+
 namespace AudioAnalysis
 {
     public class FFTs
@@ -22,22 +24,17 @@ namespace AudioAnalysis
         public double[] window { get; private set; }
         public int sampleRate { get; private set; }
         public int stepSize { get; private set; }
-
         public int FreqNyquist => sampleRate / 2;
-
         public int nyquistBin => fftSize / 2;
-
         public int fftSize => window.Length;
-
         public int FreqResolution => sampleRate / window.Length;
+        public int Count => ffts.Count;
 
         private const int default_Fftsize = 1024;
-
         private const int default_overlap = 20; //stepSizes per Window length
-
         private double[] default_window = Fourier.Window.RootHann(default_Fftsize);
 
-        
+
 
         public FFTs(double[] audio, int sampleRate, int stepSize, double[] window)
         {
@@ -75,24 +72,31 @@ namespace AudioAnalysis
         {
             double[] audioD = GetAudioDouble();
             float[] audioF = new float[audioD.Length];
-            for(int i = 0; i < audioF.Length; i++) audioF[i] = (float)audioD[i];
-
+            for (int i = 0; i < audioD.Length; i++) audioF[i] = (float)audioD[i];
             return audioF;
         }
 
+        public List<Complex[]> CopyFFTs() => CopyFFTs(0, ffts.Count);
 
-        //TODO: Consider a better / more "standard" cloning solution
-        public List<Complex[]> CopyFFTs()
+        public List<Complex[]> CopyFFTs(int startIndex, int count)
         {
             List<Complex[]> newList = new List<Complex[]>();
-            foreach (Complex[] fft in ffts)
+            for(int i = startIndex; i < startIndex+count; i++)
             {
-                Complex[] copy = new Complex[fft.Length];
-                for (int i = 0; i < fft.Length; i++)
-                    copy[i] = new Complex(fft[i].Real, fft[i].Imaginary);
+                Complex[] copy = new Complex[ffts[i].Length];
+                Array.Copy(ffts[i], copy, ffts[i].Length); //Complex is a struct and passed by value
                 newList.Add(copy);
             }
             return newList;
+        }
+
+
+        public FFTs Copy() => Copy(0, ffts.Count);
+
+        public FFTs Copy(int startIndex, int count)
+        {
+            //Deep copy
+            return new FFTs(CopyFFTs(startIndex, count), sampleRate, stepSize, window);
         }
 
         public void SaveToWav(string filename)
@@ -102,68 +106,27 @@ namespace AudioAnalysis
             writer.WriteSamples(audio, 0, audio.Length);
         }
 
-        public FFTs Copy()
-        {
-            /**
-             * Produces a deep copy
-             */
-            return new FFTs(CopyFFTs(), sampleRate, stepSize, window);
-        }
-
-        public FFTs TimeSlice(int timeIndex1, int timeIndex2)
-        {
-            List<Complex[]> slice = new List<Complex[]>();
-            for (int n = timeIndex1; n < timeIndex2; n++)
-                slice.Add(ffts[n]);
-            return new FFTs(slice, sampleRate, stepSize, window);
-        }
-        /**
-        public FFTs Index(int timeIndex1, int timeIndex2, int freqIndex1, int freqIndex2)
-        {
-            /**
-             * Returns a smaller snapshot of the FFTs contained within those indices
-             
-            List<Complex[]> slice = new List<Complex[]>();
-            for(int t = timeIndex1; t < timeIndex2; t++)
-            {
-                Complex[] time_slice = new Complex[freqIndex2 - freqIndex1];
-                for (int f = freqIndex1; f < freqIndex2; f++)
-                    time_slice[f - freqIndex1] = ffts[t][f];
-                slice.Add(time_slice);
-            }
-
-            return new FFTs(slice, sampleRate, stepSize, window);
-        }*/
-
-        public int Count => ffts.Count;
-
         public void SaveSnippet(string filename, int startIndex, int endIndex)
         {
-            List<Complex[]> copy = CopyFFTs();
-            List<Complex[]> snippet = new List<Complex[]>();
-            for (int i = startIndex; i <= endIndex; i++)
-                snippet.Add(copy[i]);
+            List<Complex[]> snippet = CopyFFTs(startIndex, endIndex - startIndex);
             FFTs stft_snippet = new FFTs(snippet, sampleRate, stepSize, window);
             stft_snippet.SaveToWav(filename);
         }
-        /**
-         * The purpose of Mirror is to reproduce the first half of the FFT into the second half since it's a real valued signal
-         * Ideally would allow me to only modify the single side band, mirror it, and then perfrom an ISTFT instead of having
-         * to modify both halves of the STFT before doing ISTFT. 
-         * 
-         * TODO: The Mirror'ed quality is kind of roboty
-         */
+
+
         private void Mirror()
         {
+            /**
+             * The purpose of Mirror is to reproduce the first half of the FFT into the second half since it's a real valued signal
+             * Ideally would allow me to only modify the single side band, mirror it, and then perfrom an ISTFT instead of having
+             * to modify both halves of the STFT before doing ISTFT. 
+             * 
+             * TODO: The Mirror'ed quality is kind of roboty
+             */
             foreach (Complex[] fft in ffts)
-            {
                 for (int i = 0; i < nyquistBin; i++)
-                {
-                    Complex val = fft[i];
-                    fft[fft.Length - 1 - i].Real = val.Real;
-                    fft[fft.Length - 1 - i].Imaginary = -val.Imaginary;
-                }
-            }
+                    fft[fft.Length - 1 - i] = fft[i];
+
         }
 
     }
