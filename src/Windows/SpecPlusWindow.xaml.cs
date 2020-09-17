@@ -66,6 +66,9 @@ namespace SpecPlus
             SpecInit();
         }
 
+        public FFTs GetSTFT() => stft;
+        public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
+
         //What the program does every clock cycle
         private void SpecTimer_tick(object sender, EventArgs e)
         {
@@ -106,6 +109,7 @@ namespace SpecPlus
             listener?.Dispose();
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
+            if(cmaps != null) spec.SetColormap(cmaps[cbCmaps.SelectedIndex]); //todo this is a hack for a race condition
             stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
         }
 
@@ -343,31 +347,6 @@ namespace SpecPlus
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
-        private void ButtonNonLinFrequencyShifter_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
-        private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
-        private void ButtonWhiteNoiseFilter_Click(object sender, RoutedEventArgs e)
-        {
-            var whiteNoiseWindow= new WhiteNoiseFilterWindow(this);
-            whiteNoiseWindow.Activate();
-            whiteNoiseWindow.Show();
-            whiteNoiseWindow.Topmost = true;
-
-            //TODO
-        }
-
-        public void WhiteNoiseFilterAll(double threshold)
-        {
-            Filter.WhiteNoiseFilter(stft, threshold);
-        }
-
         private (int lowerTimeIndex, int higherTimeIndex, int lowerFreqIndex, int higherFreqIndex) WindowPoints()
         {
             Point startPoint = selectedWindow.startPoint;
@@ -382,16 +361,21 @@ namespace SpecPlus
             return (timeIndex1, timeIndex2, freqIndex1, freqIndex2);
 
         }
-        public void WhiteNoiseFilterSelectedWindow(double threshold)
-        {
-            if (!selectedWindow.WindowExists())
-            {
-                MessageBox.Show("There is no window selected!");
-                return;
-            }
 
-            Filter.WhiteNoiseFilter(stft, threshold, selectedIndices);
 
-        }
+
+
+        private void ButtonNonLinFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
+            NonlinearFrequencyShifterWindow.OpenWindow(this);
+
+        private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
+            FrequencyShifterWindow.OpenWindow(this);
+
+        private void ButtonWhiteNoiseFilter_Click(object sender, RoutedEventArgs e) =>
+            WhiteNoiseFilterWindow.OpenWindow(this);
+
+        private void ButtonApplyGain_Click(object sender, RoutedEventArgs e) =>
+            ApplyGainWindow.OpenWindow(this);
+        
     }
 }
