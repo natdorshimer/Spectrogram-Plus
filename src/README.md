@@ -3,7 +3,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/natdorshimer/Spectrogram-Plus">
-    <img src="https://raw.githubusercontent.com/natdorshimer/Spectrogram-Plus/master/icon.PNG" alt="icon" width="150" height="150"/>
+    <img src="https://raw.githubusercontent.com/natdorshimer/Spectrogram-Plus/master/src/Windows/icon.PNG" alt="icon" width="150" height="150"/>
   </a>
 
   <h3 align="center">Spectrogram Plus (in development)<br/></h3>
