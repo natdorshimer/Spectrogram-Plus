@@ -10,117 +10,82 @@
         >
     <Grid x:Name="SpecPlusGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/> 
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="auto"/> <!--All controls-->
+            <ColumnDefinition Width="1*"/> <!--Spectrogram -->
         </Grid.ColumnDefinitions>
-        <Grid x:Name="ControlsGrid" Grid.Row="0" Grid.Column="0">
+        <Grid x:Name="ControlsGrid" Grid.Row="0" Grid.Column="0" Margin="20,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-
-            <Grid x:Name="SpecControls" Grid.Row="0" Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="160"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="TextBoxTitle" Grid.Column="1" Grid.Row = "1" FontSize="30" FontWeight="Bold" Text="Spectrogram"
+            <StackPanel x:Name="SpecOptions" Grid.Column="1" Grid.Row="1">
+                    <TextBlock x:Name="TextBoxTitle" Grid.Column="1" Grid.Row = "1" FontSize="30" FontWeight="Bold" Text="Spectrogram"
                            Grid.ColumnSpan="1" Margin="0,0,0,15"/>
-                <ComboBox x:Name="cbMicInput" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbMicInput_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text ="{Binding Mode=OneWay}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox x:Name="cbFFTsize" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbFFTsize_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text ="{Binding Mode=OneWay}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox x:Name="cbCmaps" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbCmaps_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text ="{Binding Mode=OneWay}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox x:Name="cbSampleRate" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbSampleRate_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text ="{Binding Mode=OneWay}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox x:Name="cbOverlap" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbOverlap_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text ="{Binding Mode=OneWay}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1" Margin="0,0,0,10"
+                    <ComboBox x:Name="cbMicInput" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbMicInput_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox x:Name="cbFFTsize" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbFFTsize_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox x:Name="cbCmaps" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbCmaps_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox x:Name="cbSampleRate" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbSampleRate_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox x:Name="cbOverlap" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbOverlap_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1" Margin="0,0,0,10"
                         Maximum="20" Value="7.5"/>
-                <Button x:Name="PauseButton" Grid.Row="8" Grid.Column="1" Click="PauseButton_Click">
-                    <TextBlock x:Name="PauseButtonText" Text="Pause"></TextBlock>
-                </Button>
-                <TextBlock x:Name="MousePosition" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1">Time, Freq</TextBlock>
-            </Grid>
+                    <Button x:Name="PauseButton" Grid.Row="8" Grid.Column="1" Click="PauseButton_Click">
+                        <TextBlock x:Name="PauseButtonText" Text="Pause"></TextBlock>
+                    </Button>
+                    <TextBlock x:Name="MousePosition" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1">Time, Freq</TextBlock>
+                </StackPanel>
 
-            <Grid x:Name="FilterControls" Grid.Row="1" Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
                 <!-- Audio Filter XAML -->
+            <StackPanel x:Name="StackPanelFilters" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,15,0,0">
                 <TextBlock Grid.Row="1" Grid.Column="1"  FontSize="20" Margin="0,0,0,10" Grid.ColumnSpan="2" Text="Audio Processing"/>
                 <Slider x:Name="sliderAudioGain" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Maximum="20" Value="0"  Margin="0,0,0,10"/>
                 <Button x:Name="ButtonApplyGain" Click="ButtonApplyGain_Click"
-                        Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="Apply Gain" Margin="0,0,0,10"/>
+                            Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="Apply Gain" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonWhiteNoiseFilter" Click="ButtonWhiteNoiseFilter_Click"
-                    Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="White Noise Filter" Margin="0,0,0,10"/>
+                        Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="White Noise Filter" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonFrequencyShifter_Click"
-                        Grid.Row="5" Grid.Column="1" Content="Freq Shift" Margin="0,0,0,10"/>
+                            Grid.Row="5" Grid.Column="1" Content="Freq Shift" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonNonLinFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonNonLinFrequencyShifter_Click"
-                        Grid.Row="6" Grid.Column="1" Content="NL Freq Shift" Margin="0,0,0,10"/>
+                            Grid.Row="6" Grid.Column="1" Content="NL Freq Shift" Margin="0,0,0,10"/>
                 <!-- End of Audio Filter XAML -->
-            </Grid>
+            </StackPanel>
         </Grid>
-
         <Grid x:Name="SpecGrid"  Grid.Row="0" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>

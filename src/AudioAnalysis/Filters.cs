@@ -11,7 +11,6 @@ namespace AudioAnalysis
     public static class Filters
     {
         //Provides a set of general purpose filters that act on a Short Time Fourier Transform object
-
         private static void LowPassFilter(FFTs stft, double cutoff, SelectedWindowIndices indices = null)
         {
             (int timeIndex1, int timeIndex2, int freqIndex1, int freqIndex2) =
@@ -65,11 +64,11 @@ namespace AudioAnalysis
                 {
                     if (data[n][k].Magnitude < threshold)
                     {
-                        data[n][k].Real = 0;
-                        data[n][k].Imaginary = 0;
+                        data[n][k] = new Complex();
                     }
                 }
             }
+
         }
 
     }

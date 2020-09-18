@@ -52,11 +52,9 @@ namespace AudioAnalysis
             {
                 Complex[] fft = ffts[n];
                 Complex[] shifted_fft = new Complex[fft.Length];
-                Array.Fill(shifted_fft, new Complex(0, 0));
                 for (int k = 0; k < fft.Length; k++)
                     if(k + shift_map[k] >= 0 && k + shift_map[k] < fft.Length) //Ignore the ones that get shifted too far
                         shifted_fft[k + shift_map[k]] += fft[k]*shift_mod[k];
-
                 Array.Copy(shifted_fft, fft, fft.Length);
             }
         }
