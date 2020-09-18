@@ -52,12 +52,13 @@ namespace AudioAnalysis
             }
         }
 
-        public static void WhiteNoiseFilter(FFTs stft, double threshold, SelectedWindowIndices indices = null)
+        public static void WhiteNoiseFilter(FFTs stft, double threshold, SelectedWindowIndices indices = null, bool dB = true)
         {
             List<Complex[]> data = stft.GetFFTs();
             (int timeIndex1, int timeIndex2, int freqIndex1, int freqIndex2) =
                 indices != null ? indices.Indices() : (0, data.Count, 0, stft.fftSize);
 
+            threshold = dB ? Math.Pow(10, threshold / 20) : threshold;
             for (int n = timeIndex1; n < timeIndex2; n++)
             {
                 for (int k = freqIndex1; k < freqIndex2; k++)

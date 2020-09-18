@@ -23,7 +23,7 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
-        <TextBlock FontSize="18" Text="Gain -10dB to 10dB" FontFamily="Segoe UI" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20"></TextBlock>
+        <TextBlock x:Name="TextBoxGain" FontSize="18" Text="Gain: 0 dB" FontFamily="Segoe UI" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20"></TextBlock>
         <Slider x:Name="SliderGain" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Maximum="10" Minimum="-10" Value="0"/>
         <Button x:Name="ButtonApplyToWhole" Click="ButtonApplyToWhole_Click"
                 Grid.Row="3" Grid.Column="1" Margin="0,0,0,20" Content="Apply to All"/>

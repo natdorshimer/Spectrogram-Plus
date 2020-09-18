@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpecPlus"
         mc:Ignorable="d"
-        Title="Spectrogram Plus" Height="700" Width="800" FontSize="16" FontFamily="Segoe UI Light" Icon="/Windows/icon.PNG"
+        Title="Spectrogram Plus" 
+        Height="700" Width="800" 
+        FontSize="16" FontFamily="Segoe UI Light" 
+        Icon="/Windows/icon.PNG"
         KeyDown="Window_KeyDown"
         >
     <Grid x:Name="SpecPlusGrid">
@@ -74,15 +77,16 @@
                 <!-- Audio Filter XAML -->
             <StackPanel x:Name="StackPanelFilters" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,15,0,0">
                 <TextBlock Grid.Row="1" Grid.Column="1"  FontSize="20" Margin="0,0,0,10" Grid.ColumnSpan="2" Text="Audio Processing"/>
-                <Slider x:Name="sliderAudioGain" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Maximum="20" Value="0"  Margin="0,0,0,10"/>
+                <Slider x:Name="sliderAudioGain" Maximum="20" Value="0"
+                        Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,10"  />
                 <Button x:Name="ButtonApplyGain" Click="ButtonApplyGain_Click"
                             Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="Apply Gain" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonWhiteNoiseFilter" Click="ButtonWhiteNoiseFilter_Click"
                         Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="White Noise Filter" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonFrequencyShifter_Click"
                             Grid.Row="5" Grid.Column="1" Content="Freq Shift" Margin="0,0,0,10"/>
-                <Button x:Name="ButtonNonLinFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonNonLinFrequencyShifter_Click"
-                            Grid.Row="6" Grid.Column="1" Content="NL Freq Shift" Margin="0,0,0,10"/>
+                <Button x:Name="ButtonNonLinFrequencyShifter" Content="NL Freq Shift" Click="ButtonNonLinFrequencyShifter_Click"
+                            Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"  Margin="0,0,0,10"/>
                 <!-- End of Audio Filter XAML -->
             </StackPanel>
         </Grid>

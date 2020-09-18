@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using AudioAnalysis;
 using SpecPlus.Design;
+using System.Windows.Threading;
 
 namespace SpecPlus.Windows
 {
@@ -22,10 +23,19 @@ namespace SpecPlus.Windows
     public partial class WhiteNoiseFilterWindow : Window
     {
         private SpecPlusWindow parentRef;
+        private DispatcherTimer clock;
         public WhiteNoiseFilterWindow(SpecPlusWindow parentRef)
         {
             InitializeComponent();
             this.parentRef = parentRef;
+            clock = new DispatcherTimer();
+            clock.Tick += Clock_Tick;
+            clock.Start();
+        }
+
+        private void Clock_Tick(object sender, EventArgs e)
+        {
+            TextBoxWhiteNoise.Text = $"Threshold: {(int) SliderWhiteNoiseThreshold.Value} dB";
         }
 
         public static void OpenWindow(SpecPlusWindow parentRef)

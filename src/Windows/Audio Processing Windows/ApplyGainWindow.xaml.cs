@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace SpecPlus.Windows
 {
@@ -20,15 +21,9 @@ namespace SpecPlus.Windows
     /// </summary>
     public partial class ApplyGainWindow : Window
     {
-        public static void OpenWindow(SpecPlusWindow parentRef)
-        {
-            ApplyGainWindow gainWindow = new ApplyGainWindow(parentRef);
-            gainWindow.Activate();
-            gainWindow.Show();
-            gainWindow.Topmost = true;
-
-        }
         private SpecPlusWindow parentRef;
+        private DispatcherTimer clock;
+
         public ApplyGainWindow()
         {
             InitializeComponent();
@@ -37,8 +32,16 @@ namespace SpecPlus.Windows
         {
             InitializeComponent();
             this.parentRef = parentRef;
+            this.clock = new DispatcherTimer();
+            this.clock.Tick += Clock_Tick;
+            this.clock.Start();
         }
 
+        private void Clock_Tick(object sender, EventArgs e)
+        {
+            TextBoxGain.Text = $"Gain: {(int)SliderGain.Value} dB";
+      
+        }
 
         public void ApplyGain(double dbGain, bool applyToWindow = false)
         {
@@ -55,6 +58,15 @@ namespace SpecPlus.Windows
             }
             else
                 Processing.AddGain(stft, dbGain, dB: true);
+        }
+
+        public static void OpenWindow(SpecPlusWindow parentRef)
+        {
+            ApplyGainWindow gainWindow = new ApplyGainWindow(parentRef);
+            gainWindow.Activate();
+            gainWindow.Show();
+            gainWindow.Topmost = true;
+
         }
 
         private void ButtonApplyToWhole_Click(object sender, RoutedEventArgs e) =>
