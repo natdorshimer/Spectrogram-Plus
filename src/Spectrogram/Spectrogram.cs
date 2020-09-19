@@ -275,6 +275,11 @@ namespace Spectrogram
             return ffts;
         }
 
+        public FFTs GetSTFT()
+        {
+            return new FFTs(GetFFTs(), SampleRate, StepSize, GetWindow());
+        }
+
         public List<Complex[]> CopyFFTs()
         {
             List<Complex[]> copy = new List<Complex[]>();

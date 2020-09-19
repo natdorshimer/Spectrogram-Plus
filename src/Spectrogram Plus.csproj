@@ -3,13 +3,13 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Spectrogram_Plus</RootNamespace>
+    <RootNamespace>SpecPlus</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>SpecPlusIcon.ico</ApplicationIcon>
     <PackageIcon>icon.PNG</PackageIcon>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>SpecPlusKey.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>SpecPlusKey.snk</AssemblyOriginatorKeyFile>
     <RepositoryUrl>https://github.com/natdorshimer/Spectrogram-Plus</RepositoryUrl>
     <Authors>Natalie Dorshimer</Authors>
     <AssemblyVersion>0.0.2.5</AssemblyVersion>

@@ -91,6 +91,7 @@ namespace SpecPlus
             listener = new Listener(cbMicInput.SelectedIndex, sampleRate);
             spec = new Spectrogram.Spectrogram(sampleRate, fftSize, stepSize);
             if(cmaps != null) spec.SetColormap(cmaps[cbCmaps.SelectedIndex]); //todo this is a hack for this running before SpecInit
+
             stft = new FFTs(spec.GetFFTs(), spec.SampleRate, spec.StepSize, spec.GetWindow());
         }
 
@@ -132,7 +133,7 @@ namespace SpecPlus
             cmaps = Colormap.GetColormaps();
             foreach (Colormap cmap in cmaps)
                 cbCmaps.Items.Add(cmap.Name);
-            cbCmaps.SelectedIndex = cbCmaps.Items.IndexOf("Viridis");
+            cbCmaps.SelectedIndex = cbCmaps.Items.IndexOf("Magma");
 
 
             //Timer used to continously update the spectrogram with new data
