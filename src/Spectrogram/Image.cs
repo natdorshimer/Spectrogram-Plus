@@ -19,14 +19,15 @@ namespace Spectrogram
         public static BitmapSource GetBitmapSource(IList<FftSharp.Complex[]> ffts, Colormap cmap, int sampleRate, double intensity = 1, bool dB = false, bool roll = false, int rollOffset = 0, double whiteNoiseMin = 0)
         {
             int resolution = sampleRate / ffts[0].Length;
-            int maxFreq = 1000000;
+            int maxFreq = 7000;
             int maxBin = maxFreq / resolution;
             if (ffts.Count == 0)
                 throw new ArgumentException("This Spectrogram contains no FFTs (likely because no signal was added)");
 
 
             int Width = ffts.Count;
-            int Height = ffts[0].Length; //No point in showing beyond nyquist frequency
+            int Height = Math.Min(maxBin, ffts[0].Length/2); //No point in showing beyond nyquist frequency
+           
 
             var pixelFormat = System.Windows.Media.PixelFormats.Indexed8;
             WriteableBitmap bit = new WriteableBitmap(Width, Height, 96, 96, pixelFormat, cmap.GetBitmapPalette());

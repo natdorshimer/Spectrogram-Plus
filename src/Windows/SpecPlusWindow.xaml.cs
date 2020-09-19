@@ -57,7 +57,7 @@ namespace SpecPlus
         private double overlap = 0.5;
         private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
-        private double zoomFactor = 1;
+        private double zoomFactor = 2;
 
         public FFTs GetSTFT() => stft;
         public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
@@ -137,7 +137,7 @@ namespace SpecPlus
 
             //Init fft settings
             for (int i = 9; i < 14; i++)
-                cbFFTsize.Items.Add($"2^{i} ({1 << i:N0})");
+                cbFFTsize.Items.Add($"({1 << i:N0})");
             cbFFTsize.SelectedIndex = 1;
 
             //Init fft settings
@@ -158,6 +158,9 @@ namespace SpecPlus
             specTimer.Interval = TimeSpan.FromMilliseconds(5);
             specTimer.Tick += new EventHandler(SpecTimer_tick);
             specTimer.Start();
+
+            scrollViewerSpec.ScrollToBottom();
+            scrollViewerSpec.ScrollToRightEnd();
         }
 
         private void SaveSpectrogram()
@@ -183,7 +186,6 @@ namespace SpecPlus
                 else
                     stft_copy = stft.Copy(); //To not apply the gain to the spectrogram
 
-                Processing.AddGain(stft_copy, sliderAudioGain.Value);
                 stft_copy.SaveToWav(filename);
             }
         }
@@ -221,7 +223,6 @@ namespace SpecPlus
         {
             string filename = "C:\\Users\\Natalie\\Documents\\wavs\\snips\\QuickSave.wav";
             FFTs stft_copy = stft.Copy();
-            Processing.AddGain(stft_copy, sliderAudioGain.Value);
             if (selectedIndices.Exists())
                 stft_copy.SaveSnippet(filename, selectedIndices.Indices().timeIndex1, selectedIndices.Indices().timeIndex2);
             else
@@ -246,9 +247,9 @@ namespace SpecPlus
         {
             specPaused = !specPaused;
             if (specPaused)
-                PauseButtonText.Text = "Run";
+                PauseButton.Content = "Run";
             else
-                PauseButtonText.Text = "Pause";
+                PauseButton.Content = "Pause";
         }
 
         private void PauseSpectrogram()
@@ -297,8 +298,6 @@ namespace SpecPlus
                 case (Key.S):
                     if ((Keyboard.IsKeyDown(Key.LeftCtrl) || (Keyboard.IsKeyDown(Key.RightCtrl))))
                         SaveSpectrogram();
-                    else
-                        QuickSaveSnippet();
                     break;
             }
         }
@@ -314,11 +313,11 @@ namespace SpecPlus
             //Update mouse position info for frequency and time location
             (int t_index, int f_index) = PositionToIndices(p);
 
-            double time = (t_index * time_resolution * 1000); //ms
+            double time = (int)(t_index * time_resolution*1000); //ms
             int freq = (int)(freq_resolution * f_index);   //hz
 
             if(time > 1000)
-                MousePosition.Text =  $"{freq} Hz,  {Math.Round(time/1000, 2)} s";
+                MousePosition.Text =  $"{freq} Hz,  {Math.Round((time/1000),1)} s";
             else
                 MousePosition.Text = $"{freq} Hz,  {(int)time} ms";
         }
@@ -339,12 +338,9 @@ namespace SpecPlus
             selectedIndices = new SelectedWindowIndices(t1, t2, f1, f2);
         }
 
-        private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
+        private void PaintGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e) =>
             TogglePause();
 
-            //TODO: Modify behavior for freq dependent freq shifting possibly
-        }
 
         private void PaintGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -373,9 +369,6 @@ namespace SpecPlus
         }
 
 
-        private void ButtonNonLinFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
-            FrequencyDependentShifterWindow.OpenWindow(this);
-
         private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e) =>
             FrequencyShifterWindow.OpenWindow(this);
 
@@ -384,6 +377,9 @@ namespace SpecPlus
 
         private void ButtonApplyGain_Click(object sender, RoutedEventArgs e) =>
             ApplyGainWindow.OpenWindow(this);
+
+        private void ButtonSaveSpectrogram_Click(object sender, RoutedEventArgs e) =>
+            SaveSpectrogram();
         
     }
 }

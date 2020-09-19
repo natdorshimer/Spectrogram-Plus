@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpecPlus"
         mc:Ignorable="d"
-        Title="Spectrogram Plus" 
-        Height="700" Width="800" 
+        Title="SpecPlus" 
+        Height="570" Width="800" 
         FontSize="16" FontFamily="Segoe UI Light" 
         Icon="/Windows/icon.PNG"
         KeyDown="Window_KeyDown"
@@ -19,76 +19,77 @@
             <ColumnDefinition Width="auto"/> <!--All controls-->
             <ColumnDefinition Width="1*"/> <!--Spectrogram -->
         </Grid.ColumnDefinitions>
-        <Grid x:Name="ControlsGrid" Grid.Row="0" Grid.Column="0" Margin="20,10,0,0">
+        <Grid x:Name="ControlsGrid" Grid.Row="0" Grid.Column="0" Margin="10,10,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <StackPanel x:Name="SpecOptions" Grid.Column="1" Grid.Row="1">
-                    <TextBlock x:Name="TextBoxTitle" Grid.Column="1" Grid.Row = "1" FontSize="30" FontWeight="Bold" Text="Spectrogram"
-                           Grid.ColumnSpan="1" Margin="0,0,0,15"/>
-                    <ComboBox x:Name="cbMicInput" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbMicInput_SelectionChanged">
+            <ScrollViewer Margin ="0,0,0,0" x:Name="ControlViewer" FlowDirection="RightToLeft" Width="180" VerticalScrollBarVisibility="auto">
+                <StackPanel x:Name="SpecOptions" Grid.Column="1" Grid.Row="1" FlowDirection="LeftToRight" Margin="0,0,0,0">
+                    <TextBlock x:Name="TextBoxTitle" FontSize="30" FontWeight="Bold" Text="SpecPlus" Margin="0,0,0,15"/>
+                    <ComboBox x:Name="cbMicInput" Margin="0,0,0,10" SelectionChanged="cbMicInput_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text ="{Binding Mode=OneWay}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <ComboBox x:Name="cbFFTsize" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbFFTsize_SelectionChanged">
+                    <ComboBox x:Name="cbFFTsize" Margin="0,0,0,10" SelectionChanged="cbFFTsize_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="FFT Size: "/>
+                                    <TextBlock Text ="{Binding Mode=OneWay}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox x:Name="cbCmaps" Margin="0,0,0,10" SelectionChanged="cbCmaps_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text ="{Binding Mode=OneWay}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <ComboBox x:Name="cbCmaps" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbCmaps_SelectionChanged">
+                    <ComboBox x:Name="cbSampleRate" Margin="0,0,0,10" SelectionChanged="cbSampleRate_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="SR: "/>
+                                    <TextBlock Text ="{Binding Mode=OneWay}"/>
+                                    <TextBlock Text =" Hz"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <ComboBox x:Name="cbSampleRate" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbSampleRate_SelectionChanged">
+                    <ComboBox x:Name="cbOverlap" Margin="0,0,0,10" SelectionChanged="cbOverlap_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text ="{Binding Mode=OneWay}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Overlap: "/>
+                                    <TextBlock Text ="{Binding Mode=OneWay}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <ComboBox x:Name="cbOverlap" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Margin="0,0,0,10" SelectionChanged="cbOverlap_SelectionChanged">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text ="{Binding Mode=OneWay}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <Slider x:Name="sliderBrightness" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1" Margin="0,0,0,10"
-                        Maximum="20" Value="7.5"/>
-                    <Button x:Name="PauseButton" Grid.Row="8" Grid.Column="1" Click="PauseButton_Click">
-                        <TextBlock x:Name="PauseButtonText" Text="Pause"></TextBlock>
-                    </Button>
-                    <TextBlock x:Name="MousePosition" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1">Time, Freq</TextBlock>
+                                    
+                    <TextBlock x:Name="MousePosition" Text="Time, Freq"/>
+                    <TextBlock  FontSize="20" Text="Audio Processing" Margin="0,20,0,10"/>
+                    <DockPanel>
+                        <TextBlock Text="Brightness"/>
+                        <Slider x:Name="sliderBrightness" Margin="0,0,0,10"
+                            Maximum="20" Value="7.5"/>
+                    </DockPanel>
+                    <Button x:Name="PauseButton" Content="Pause" Click="PauseButton_Click" Margin="0,0,0,10"/>
+                    <Button x:Name="ButtonApplyGain" Click="ButtonApplyGain_Click" Content="Apply Gain" Margin="0,0,0,10"/>
+                    <Button x:Name="ButtonWhiteNoiseFilter" Click="ButtonWhiteNoiseFilter_Click" Content="White Noise Filter" Margin="0,0,0,10"/>
+                    <Button x:Name="ButtonFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonFrequencyShifter_Click" Content="Frequency Shift" Margin="0,0,0,10"/>
+                    <Button x:Name="ButtonSaveSpectrogram" Content="Save Spectrogram" Click="ButtonSaveSpectrogram_Click" Margin="0,0,0,0"/>
                 </StackPanel>
+            </ScrollViewer>
 
-                <!-- Audio Filter XAML -->
-            <StackPanel x:Name="StackPanelFilters" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,15,0,0">
-                <TextBlock Grid.Row="1" Grid.Column="1"  FontSize="20" Margin="0,0,0,10" Grid.ColumnSpan="2" Text="Audio Processing"/>
-                <Slider x:Name="sliderAudioGain" Maximum="20" Value="0"
-                        Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,10"  />
-                <Button x:Name="ButtonApplyGain" Click="ButtonApplyGain_Click"
-                            Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="Apply Gain" Margin="0,0,0,10"/>
-                <Button x:Name="ButtonWhiteNoiseFilter" Click="ButtonWhiteNoiseFilter_Click"
-                        Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="White Noise Filter" Margin="0,0,0,10"/>
-                <Button x:Name="ButtonFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonFrequencyShifter_Click"
-                            Grid.Row="5" Grid.Column="1" Content="Freq Shift" Margin="0,0,0,10"/>
-                <Button x:Name="ButtonNonLinFrequencyShifter" Content="Hz Dependent Hz Shift" Click="ButtonNonLinFrequencyShifter_Click"
-                            Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"  Margin="0,0,0,10"/>
-                <!-- End of Audio Filter XAML -->
-            </StackPanel>
         </Grid>
         <Grid x:Name="SpecGrid"  Grid.Row="0" Grid.Column="1">
             <Grid.ColumnDefinitions>
@@ -100,7 +101,7 @@
             </Grid.RowDefinitions>
             <ScrollViewer x:Name ="scrollViewerSpec" VerticalScrollBarVisibility="Visible"  HorizontalScrollBarVisibility="Visible" Grid.Row ="1" Grid.Column="1"  Margin="20,0,0,0" ScrollChanged="scrollViewerSpec_ScrollChanged">
                 <Grid x:Name="PaintGrid" MouseLeftButtonDown="PaintGrid_MouseLeftButtonDown" MouseLeftButtonUp="PaintGrid_MouseLeftButtonUp" MouseRightButtonDown="PaintGrid_MouseRightButtonDown" MouseWheel="PaintGrid_MouseWheel">
-                    <Image x:Name="imageSpec" MouseMove="PaintGrid_MouseMove"  />
+                    <Image x:Name="imageSpec" MouseMove="PaintGrid_MouseMove"  VerticalAlignment="Top" />
                 </Grid>
             </ScrollViewer>
         </Grid>
