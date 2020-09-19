@@ -7,6 +7,15 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>SpecPlusIcon.ico</ApplicationIcon>
     <PackageIcon>icon.PNG</PackageIcon>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>SpecPlusKey.pfx</AssemblyOriginatorKeyFile>
+    <RepositoryUrl>https://github.com/natdorshimer/Spectrogram-Plus</RepositoryUrl>
+    <Authors>Natalie Dorshimer</Authors>
+    <AssemblyVersion>0.0.2.5</AssemblyVersion>
+    <FileVersion>0.0.2.5</FileVersion>
+    <Version>0.25</Version>
+    <PackageProjectUrl>https://github.com/natdorshimer/Spectrogram-Plus</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -237,7 +237,7 @@ namespace SpecPlus
             int fft_index = PositionToIndices(p).t_index;
             Complex[] fft = spec.GetFFTs()[fft_index];
             FFTPlot plotwin = new FFTPlot();
-            plotwin.PlotFFT(fft, spec.SampleRate);
+            plotwin.PlotFFT(fft, spec.SampleRate, ssb: true);
             plotwin.Activate();
             plotwin.Show();
             plotwin.Topmost = true;
