@@ -10,6 +10,7 @@ ExtResources*
 invalid_windows*
 .vscode*
 Obsolete*
+*.snk
 
 
 # User-specific files
