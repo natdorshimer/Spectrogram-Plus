@@ -85,7 +85,7 @@
                         Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="White Noise Filter" Margin="0,0,0,10"/>
                 <Button x:Name="ButtonFrequencyShifter" Grid.ColumnSpan="2" Click="ButtonFrequencyShifter_Click"
                             Grid.Row="5" Grid.Column="1" Content="Freq Shift" Margin="0,0,0,10"/>
-                <Button x:Name="ButtonNonLinFrequencyShifter" Content="NL Freq Shift" Click="ButtonNonLinFrequencyShifter_Click"
+                <Button x:Name="ButtonNonLinFrequencyShifter" Content="Hz Dependent Hz Shift" Click="ButtonNonLinFrequencyShifter_Click"
                             Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"  Margin="0,0,0,10"/>
                 <!-- End of Audio Filter XAML -->
             </StackPanel>

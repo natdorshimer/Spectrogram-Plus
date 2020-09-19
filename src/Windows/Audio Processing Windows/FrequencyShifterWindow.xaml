@@ -24,7 +24,7 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <TextBlock x:Name="TextBlockFreq" FontSize="18" Text="Frequency Shift: 0 Hz" FontFamily="Segoe UI" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20"></TextBlock>
-        <Slider x:Name="SliderGain" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Minimum="-200" Maximum="200" Value="0"/>
+        <Slider x:Name="SliderFreqShift" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Minimum="-200" Maximum="200" Value="0"/>
         <Button x:Name="ButtonApplyToWhole" Click="ButtonApplyToWhole_Click"
                 Grid.Row="3" Grid.Column="1" Margin="0,0,0,20" Content="Apply to All"/>
         <Button x:Name="ButtonApplyToWindow" Click="ButtonApplyToWindow_Click"

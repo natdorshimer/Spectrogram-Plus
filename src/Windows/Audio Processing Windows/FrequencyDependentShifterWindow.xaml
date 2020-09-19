@@ -5,8 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpecPlus.Windows"
         mc:Ignorable="d"
-        Title="FrequencyDependentShifterWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="FrequencyDependentShifterWindow"
+        Height="210" Width="250"
+        ResizeMode="NoResize">
+    <Grid x:Name="FrequencyDependentShifterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Freq Shift" Grid.Row="0" Grid.Column="0"/>
+            <TextBlock Text="Order" Grid.Row="1" Grid.Column="0"/>
+            <TextBlock Text="Attenuation" Grid.Row="2" Grid.Column="0"/>
+            <Slider Grid.Row="0" Grid.Column="1"
+                x:Name="SliderFreqShift" Margin="0,0,0,20" Minimum="-200" Maximum="200" Value="0"/>
+            <Slider x:Name="SliderOrder" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20" Minimum="0" Maximum="10" Value="2"/>
+            <Slider x:Name="SliderThreshold" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Minimum="0.5" Maximum="1" Value="0.9"/>
+            <TextBlock x:Name ="TextBoxFreqShift" Text="0 Hz" Grid.Row="0" Grid.Column="2"/>
+            <TextBlock x:Name ="TextBoxOrder" Text="1" Grid.Row="1" Grid.Column="2"/>
+            <TextBlock x:Name = "TextBoxAtten" Text="0.9" Grid.Row="2" Grid.Column="2"/>
+        </Grid>
+        <Button x:Name="ButtonApplyToWindow" Click="ButtonApplyToWindow_Click"
+                Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,20" Content="Apply to Window"/>
     </Grid>
 </Window>

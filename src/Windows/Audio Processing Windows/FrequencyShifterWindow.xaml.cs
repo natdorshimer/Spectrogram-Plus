@@ -35,7 +35,7 @@ namespace SpecPlus.Windows
 
         private void Clock_UpdateText(object sender, EventArgs e)
         {
-            this.TextBlockFreq.Text = $"Frequency Shift: {(int)SliderGain.Value} Hz";
+            this.TextBlockFreq.Text = $"Frequency Shift: {(int)SliderFreqShift.Value} Hz";
         }
 
         public static void OpenWindow(SpecPlusWindow parentRef)
@@ -58,18 +58,17 @@ namespace SpecPlus.Windows
                     MessageBox.Show("There is no window selected!");
                     return;
                 }
-                Processing.FrequencyShifter(stft, (int)SliderGain.Value, indices, isFreqDependent: false);
+                Processing.FrequencyShifter(stft, (int)SliderFreqShift.Value, indices);
             }
             else
-                Processing.FrequencyShifter(stft, (int)SliderGain.Value, isFreqDependent: false);
+                Processing.FrequencyShifter(stft, (int)SliderFreqShift.Value);
         }
 
         private void ButtonApplyToWhole_Click(object sender, RoutedEventArgs e) =>
-            ApplyFrequencyShift((int)SliderGain.Value, false);
+            ApplyFrequencyShift((int)SliderFreqShift.Value, false);
         
 
-
         private void ButtonApplyToWindow_Click(object sender, RoutedEventArgs e) =>
-            ApplyFrequencyShift((int)SliderGain.Value, true);
+            ApplyFrequencyShift((int)SliderFreqShift.Value, true);
     }
 }

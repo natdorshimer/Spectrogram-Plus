@@ -318,9 +318,9 @@ namespace SpecPlus
             int freq = (int)(freq_resolution * f_index);   //hz
 
             if(time > 1000)
-                MousePosition.Text =  $"{freq} Hz,  {Math.Round(time/1000, 2)} s";
+                MousePosition.Text =  $"{freq} Hz,  {Math.Round(time/1000, 2)} s, {Math.Round(stft.GetFFTs()[t_index][f_index].Magnitude, 2)}";
             else
-                MousePosition.Text = $"{freq} Hz,  {(int)time} ms";
+                MousePosition.Text = $"{freq} Hz,  {(int)time} ms, {Math.Round(stft.GetFFTs()[t_index][f_index].Magnitude,2)}";
         }
 
 

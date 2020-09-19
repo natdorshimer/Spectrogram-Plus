@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using SpecPlus;
 
 namespace SpecPlus.Windows
@@ -19,10 +20,22 @@ namespace SpecPlus.Windows
     public partial class FrequencyDependentShifterWindow : Window
     {
         SpecPlusWindow parentRef;
+        DispatcherTimer clock;
+
         public FrequencyDependentShifterWindow(SpecPlusWindow parentRef)
         {
             InitializeComponent();
             this.parentRef = parentRef;
+            this.clock = new DispatcherTimer();
+            this.clock.Tick += Clock_Tick;
+            this.clock.Start();
+        }
+
+        private void Clock_Tick(object sender, EventArgs e)
+        {
+            TextBoxFreqShift.Text = $"{(int)SliderFreqShift.Value} Hz";
+            TextBoxOrder.Text = $"{(int)SliderOrder.Value}";
+            TextBoxAtten.Text = string.Format("{0:0.00}", SliderThreshold.Value);
         }
 
         public static void OpenWindow(SpecPlusWindow parentRef)
@@ -32,5 +45,12 @@ namespace SpecPlus.Windows
             processWindow.Show();
             processWindow.Topmost = true;
         }
+
+        private void ButtonApplyToWindow_Click(object sender, RoutedEventArgs e)
+        {
+            AudioAnalysis.Processing.FrequencyShifter(parentRef.GetSTFT(), (int)SliderFreqShift.Value, parentRef.GetSelectedWindowIndices(), 
+                order: (int)SliderOrder.Value, thresh: SliderThreshold.Value);
+        }
+
     }
 }
