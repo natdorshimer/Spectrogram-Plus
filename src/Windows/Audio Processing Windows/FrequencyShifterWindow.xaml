@@ -6,11 +6,12 @@
         xmlns:local="clr-namespace:SpecPlus.Windows"
         mc:Ignorable="d"
         Title="FrequencyDependentShifterWindow"
-        Height="210" Width="250"
+        Height="245" Width="250"
         ResizeMode="NoResize">
     <Grid x:Name="FrequencyDependentShifterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
@@ -45,5 +46,7 @@
         </Grid>
         <Button x:Name="ButtonApplyToWindow" Click="ButtonApplyToWindow_Click"
                 Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,20" Content="Apply to Window"/>
+        <Button x:Name="ButtonShiftAll" Click="ButtonShiftAll_Click"
+                Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,20" Content="Linear shift all"/>
     </Grid>
 </Window>

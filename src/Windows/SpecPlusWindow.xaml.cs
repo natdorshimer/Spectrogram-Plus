@@ -1,33 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Reflection;
 using Spectrogram;
-using System.IO;
-using System.Globalization;
-using System.CodeDom;
-using NAudio.Wave.SampleProviders;
 using AudioAnalysis;
 using Microsoft.Win32;
 using FftSharp;
-using NAudio.Wave;
-using SpecPlus;
 using System.Windows.Controls.Primitives;
 using SpecPlus.Design;
 using SpecPlus.Windows;
@@ -269,6 +251,22 @@ namespace SpecPlus
             return stft;
         }
 
+        private (int lowerTimeIndex, int higherTimeIndex, int lowerFreqIndex, int higherFreqIndex) WindowPoints()
+        {
+            Point startPoint = selectedWindow.startPoint;
+            Point endPoint = selectedWindow.endPoint;
+            (int timeIndex1, int freqIndex1) = PositionToIndices(startPoint);
+            (int timeIndex2, int freqIndex2) = PositionToIndices(endPoint);
+            if (freqIndex2 < freqIndex1)
+                (freqIndex1, freqIndex2) = (freqIndex2, freqIndex1);
+            if (timeIndex2 < timeIndex1)
+                (timeIndex1, timeIndex2) = (timeIndex2, timeIndex1);
+
+            return (timeIndex1, timeIndex2, freqIndex1, freqIndex2);
+
+        }
+
+
         /**
          * Event Handlers
          */
@@ -352,21 +350,6 @@ namespace SpecPlus
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
-
-        private (int lowerTimeIndex, int higherTimeIndex, int lowerFreqIndex, int higherFreqIndex) WindowPoints()
-        {
-            Point startPoint = selectedWindow.startPoint;
-            Point endPoint = selectedWindow.endPoint;
-            (int timeIndex1, int freqIndex1) = PositionToIndices(startPoint);
-            (int timeIndex2, int freqIndex2) = PositionToIndices(endPoint);
-            if (freqIndex2 < freqIndex1)
-                (freqIndex1, freqIndex2) = (freqIndex2, freqIndex1);
-            if (timeIndex2 < timeIndex1)
-                (timeIndex1, timeIndex2) = (timeIndex2, timeIndex1);
-
-            return (timeIndex1, timeIndex2, freqIndex1, freqIndex2);
-
-        }
 
 
         private void ButtonFrequencyShifter_Click(object sender, RoutedEventArgs e) =>

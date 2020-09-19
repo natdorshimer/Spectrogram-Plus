@@ -52,5 +52,7 @@ namespace SpecPlus.Windows
                 order: (int)SliderOrder.Value, thresh: SliderThreshold.Value);
         }
 
+        private void ButtonShiftAll_Click(object sender, RoutedEventArgs e)=>
+            AudioAnalysis.Processing.FrequencyShifter(parentRef.GetSTFT(), (int)SliderFreqShift.Value);
     }
 }
