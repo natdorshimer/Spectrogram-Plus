@@ -26,7 +26,7 @@ like the base pitch most people know about, they are made of a combination of si
 and by modifying those you can change how the voice sounds. Many voice processing tools only shift the base pitch or they shift the entire frequency scale. The point of this project is to include tools to
 modify _specific_ resonant frequencies and observe how that changes the quality of the voice. 
 
- <img src="https://raw.githubusercontent.com/natdorshimer/Spectrogram-Plus/master/sample.PNG"/>
+ <img src="https://raw.githubusercontent.com/natdorshimer/Spectrogram-Plus/master/sample.png"/>
 
 
 <!-- GETTING STARTED 
