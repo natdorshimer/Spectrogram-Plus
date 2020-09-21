@@ -11,6 +11,7 @@ invalid_windows*
 .vscode*
 Obsolete*
 *.snk
+*.docx
 
 
 # User-specific files
