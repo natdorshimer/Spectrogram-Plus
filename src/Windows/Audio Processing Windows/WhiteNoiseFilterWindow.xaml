@@ -7,13 +7,14 @@
         xmlns:src="clr-namespace:SpecPlus.Windows"
         xmlns:local="clr-namespace:SpecPlus.Windows"
         mc:Ignorable="d"
-        Title="WhiteNoiseFilter" Height="220" Width="230"
+        Title="WhiteNoiseFilter" Height="240" Width="230"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         >
     <Grid x:Name="WhiteNoiseGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -26,10 +27,11 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <TextBlock x:Name="TextBoxWhiteNoise" FontSize="18" Text="Threshold: 0 dB" FontFamily="Segoe UI" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20"></TextBlock>
-        <Slider x:Name="SliderWhiteNoiseThreshold" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Maximum="25" Minimum="0" Value="13"/>
+        <Slider x:Name="SliderWhiteNoiseThreshold" Grid.Row="2" Grid.Column="1" Margin="0,0,0,20" Maximum="25" Minimum="0" Value="13" ValueChanged="SliderWhiteNoiseThreshold_ValueChanged"/>
         <Button x:Name="ButtonApplyToWhole" Click="ButtonApplyToWhole_Click"
                 Grid.Row="3" Grid.Column="1" Margin="0,0,0,20" Content="Apply to All"/>
         <Button x:Name="ButtonApplyToWindow" Click="ButtonApplyToWindow_Click"
                 Grid.Row="4" Grid.Column="1" Margin="0,0,0,20" Content="Apply to Window"/>
+        <Button x:Name="ButtonRealTimeFiltering" Grid.Row="5" Grid.Column="1" Margin="0,0,0,20" Content="Toggle Real Time Filter" Click="ButtonRealTimeFiltering_Click"/>
     </Grid>
 </Window>

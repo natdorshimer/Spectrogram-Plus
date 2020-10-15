@@ -22,6 +22,7 @@ namespace SpecPlus
     /// </summary>
     public partial class SpecPlusWindow : System.Windows.Window
     {
+
         private Spectrogram.Spectrogram spec; //Spectrogram
 
         private FFTs stft;
@@ -30,6 +31,7 @@ namespace SpecPlus
         private Listener listener;            //Microphone listener
         private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
         private SelectedWindowIndices selectedIndices = new SelectedWindowIndices();
+
 
         private int freq_resolution => spec.SampleRate / spec.FftSize;
         private double time_resolution => 1d / (double)freq_resolution;
@@ -41,6 +43,12 @@ namespace SpecPlus
         private bool specPaused = false;
         private double zoomFactor = 2;
 
+
+        //Determines if real time white noise filtering is enabled
+        //todo consider encapsulating
+        private bool m_RealTimeFilterEnabled = false;
+        private double m_WhiteNoiseThreshold = 0;
+
         public FFTs GetSTFT() => stft;
         public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
 
@@ -50,7 +58,6 @@ namespace SpecPlus
             SpecInit();
         }
 
-
         //What the program does every clock cycle
         private void SpecTimer_tick(object sender, EventArgs e)
         {
@@ -58,7 +65,8 @@ namespace SpecPlus
             if (!specPaused)
                 spec.Add(newAudio, process: false);
 
-            spec.Process();
+            double threshold = m_RealTimeFilterEnabled ? m_WhiteNoiseThreshold : 0;
+            spec.Process(threshold);
             DisplaySpectrogram();
         }
 
@@ -79,6 +87,16 @@ namespace SpecPlus
             imageSpec.Source = trans;
         }
 
+        public void SetWhiteNoiseFilterValue(double threshold)
+        {
+            m_WhiteNoiseThreshold = threshold;
+        }
+
+        public void ToggleRealTimeWhiteNoiseFilter(double whiteNoiseThreshold)
+        {
+            m_RealTimeFilterEnabled = !m_RealTimeFilterEnabled;
+            m_WhiteNoiseThreshold = whiteNoiseThreshold;
+        }
         
         //Sets up a listener for the selected microphone and initializes a spectrogram display
         public void StartListening()

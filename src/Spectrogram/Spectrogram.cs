@@ -56,6 +56,8 @@ namespace Spectrogram
                 SetFixedWidth(fixedWidth.Value);
         }
 
+
+
         public override string ToString()
         {
             double processedSamples = ffts.Count * settings.StepSize + settings.FftSize;
@@ -112,7 +114,7 @@ namespace Spectrogram
 
 
         //Modified to be equivalent to Fourier.STFT code.
-        public Complex[][] Process()
+        public Complex[][] Process(double whiteNoiseThreshold = 0)
         {
             if (FftsToProcess < 1)
                 return null;
@@ -123,11 +125,17 @@ namespace Spectrogram
             {
                 FftSharp.Complex[] buffer = new FftSharp.Complex[settings.FftSize];
                 int sourceIndex = newFftIndex * settings.StepSize;
+
+
                 for (int i = 0; i < settings.FftSize; i++)
                     buffer[i].Real = newAudio[sourceIndex + i] * settings.Window[i] / settings.FftSize;
 
                 FftSharp.Transform.FFT(buffer);
+
+                AudioAnalysis.Filters.WhiteNoiseFilter(buffer, whiteNoiseThreshold);
+
                 newFfts[newFftIndex] = new Complex[settings.FftSize];
+
                 for (int i = 0; i < settings.FftSize; i++) {
                     newFfts[newFftIndex][i] = buffer[i];
                 }

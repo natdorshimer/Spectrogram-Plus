@@ -68,6 +68,16 @@ namespace SpecPlus.Windows
 
         private void ButtonApplyToWindow_Click(object sender, RoutedEventArgs e) =>
             ApplyWhiteNoiseFilter(SliderWhiteNoiseThreshold.Value, applyToWindow: true);
-        
+
+        private void ButtonRealTimeFiltering_Click(object sender, RoutedEventArgs e)
+        {
+            parentRef.ToggleRealTimeWhiteNoiseFilter(SliderWhiteNoiseThreshold.Value);
+        }
+
+        private void SliderWhiteNoiseThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if(e.NewValue - e.OldValue > 0 && parentRef != null)
+                parentRef.SetWhiteNoiseFilterValue(SliderWhiteNoiseThreshold.Value);
+        }
     }
 }

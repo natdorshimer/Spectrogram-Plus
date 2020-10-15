@@ -7,7 +7,7 @@ using FftSharp;
 
 namespace AudioAnalysis
 {
-    
+
     public static class Filters
     {
         //Provides a set of general purpose filters that act on a Short Time Fourier Transform object
@@ -65,12 +65,28 @@ namespace AudioAnalysis
                 {
                     if (data[n][k].Magnitude < threshold)
                     {
-                        data[n][k] = new Complex();
+                        data[n][k].Real = 0;
+                        data[n][k].Imaginary = 0;
                     }
                 }
             }
-
         }
 
+        //Performs white noise filtering on a single FFT
+        public static void WhiteNoiseFilter(Complex[] fft, double threshold, bool dB = true)
+        {
+            threshold = dB ? Math.Pow(10, threshold / 20) : threshold;
+
+            for (int k = 0; k < fft.Length; k++)
+            {
+                if (fft[k].Magnitude < threshold)
+                {
+                    fft[k].Real = 0;
+                    fft[k].Imaginary = 0;
+                }
+            }
+        }
     }
+        
 }
+
