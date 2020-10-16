@@ -50,6 +50,7 @@ namespace SpecPlus
         private double m_WhiteNoiseThreshold = 0;
 
         public FFTs GetSTFT() => stft;
+
         public SelectedWindowIndices GetSelectedWindowIndices() => selectedIndices;
 
         public SpecPlusWindow()
@@ -318,7 +319,6 @@ namespace SpecPlus
                     break;
             }
         }
-
 
         private void PaintGrid_MouseMove(object sender, MouseEventArgs e)
         {
