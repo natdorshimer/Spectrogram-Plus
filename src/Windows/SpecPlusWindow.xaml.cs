@@ -29,25 +29,28 @@ namespace SpecPlus
         private Colormap[] cmaps;             //Colormaps for spectrogram display
         private DispatcherTimer specTimer;    //Spectrogram/Program clock
         private Listener listener;            //Microphone listener
-        private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
-        private SelectedWindowIndices selectedIndices = new SelectedWindowIndices();
-
 
         private int freq_resolution => spec.SampleRate / spec.FftSize;
         private double time_resolution => 1d / (double)freq_resolution;
-
-        //Spectrogram Settings
-        private double whiteNoiseMin = 0;     //Basic filter for White Noise
-        private double overlap = 0.5;
-        private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
-        private bool specPaused = false;
-        private double zoomFactor = 2;
-
 
         //Determines if real time white noise filtering is enabled
         //todo consider encapsulating
         private bool m_RealTimeFilterEnabled = false;
         private double m_WhiteNoiseThreshold = 0;
+
+
+        //View settings 
+
+        //Spectrogram Settings
+        private double overlap = 0.5;
+        private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
+        private bool specPaused = false;
+
+
+        private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
+        private SelectedWindowIndices selectedIndices = new SelectedWindowIndices();
+        private double zoomFactor = 2;
+
 
         public FFTs GetSTFT() => stft;
 
@@ -83,7 +86,7 @@ namespace SpecPlus
             SpecGrid.MaxWidth = specGridWidth;
             spec.SetFixedWidth((int)((specGridWidth - scrollBarSpace)));
             
-            BitmapSource source = spec.GetBitmapSource(brightness, dB: false, roll: false, whiteNoiseMin);
+            BitmapSource source = spec.GetBitmapSource(brightness, dB: false, roll: false);
             TransformedBitmap trans = new TransformedBitmap(source, new ScaleTransform(zoomFactor, zoomFactor));
             imageSpec.Source = trans;
         }
