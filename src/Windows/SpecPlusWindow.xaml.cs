@@ -46,7 +46,6 @@ namespace SpecPlus
         private readonly string[] sampleRates = { "5120", "10240", "20480", "40960" }; //Beyond 22khz is essentially pointless, but, options
         private bool specPaused = false;
 
-
         private SelectedSpecWindow selectedWindow = new SelectedSpecWindow();
         private SelectedWindowIndices selectedIndices = new SelectedWindowIndices();
         private double zoomFactor = 2;
